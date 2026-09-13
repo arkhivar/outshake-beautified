@@ -59,6 +59,28 @@ class ShadowsocksCryptoTest {
     }
 
     @Test
+    fun `full salt and low entropy prefixes are rejected for every cipher`() {
+        for (cipher in Cipher.entries) {
+            val key = ShadowsocksCrypto.deriveMasterKey("pw", cipher.keySize)
+            for (length in listOf(cipher.saltSize, cipher.saltSize - 1, cipher.saltSize - 15)) {
+                assertThrows(IllegalArgumentException::class.java) {
+                    ShadowsocksEncryptor(cipher, key, ByteArray(length))
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `maximum safe prefix still has independently random tail`() {
+        val cipher = Cipher.AES_256_GCM
+        val key = ShadowsocksCrypto.deriveMasterKey("pw", cipher.keySize)
+        val a = ShadowsocksEncryptor(cipher, key, ByteArray(16))
+        val b = ShadowsocksEncryptor(cipher, key, ByteArray(16))
+        assertArrayEquals(ByteArray(16), a.salt.copyOf(16))
+        assertTrue(!a.salt.copyOfRange(16, 32).contentEquals(b.salt.copyOfRange(16, 32)))
+    }
+
+    @Test
     fun `evp key derivation is deterministic and correct length`() {
         val k1 = ShadowsocksCrypto.deriveMasterKey("password", 32)
         val k2 = ShadowsocksCrypto.deriveMasterKey("password", 32)

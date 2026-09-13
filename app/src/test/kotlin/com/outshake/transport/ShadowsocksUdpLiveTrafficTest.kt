@@ -14,9 +14,10 @@ import java.net.Socket
 import java.util.concurrent.TimeUnit
 
 /**
- * End-to-end proof that the app's *actual* UDP transport ([ShadowsocksUdpCodec]) round-trips real
+ * JVM loopback test that the UDP codec ([ShadowsocksUdpCodec]) round-trips real
  * datagrams through a stock `ss-server` running with UDP enabled (`-u`). A local UDP echo target
- * stands in for a DNS/QUIC peer. Skips gracefully if `ss-server` is unavailable.
+ * stands in for a UDP peer; no QUIC, NAT, DNS fallback or Android TUN behavior is tested here.
+ * Opt in with -PliveTransportTests=true; skips if ss-server is unavailable.
  */
 class ShadowsocksUdpLiveTrafficTest {
 
@@ -56,6 +57,7 @@ class ShadowsocksUdpLiveTrafficTest {
     }
 
     private fun runUdpRoundTrip(cipher: Cipher) {
+        assumeTrue("live transport tests are opt-in", System.getProperty("outshake.liveTests") == "true")
         val bin = ssServerBin()
         assumeTrue("ss-server not installed; skipping UDP live traffic test", bin != null)
 

@@ -12,10 +12,10 @@ import java.net.Socket
 import java.util.concurrent.TimeUnit
 
 /**
- * End-to-end proof that the app's *actual* Shadowsocks transport code moves real bytes through a
+ * JVM loopback test that the app's Shadowsocks transport code moves real bytes through a
  * real Shadowsocks server. Spawns a stock `ss-server` (shadowsocks-libev) and a local HTTP target,
- * then drives [ShadowsocksClient] exactly as [com.outshake.vpn.OutshakeVpnService] does. Runs with
- * and without a salt prefix and across ciphers. Skips gracefully if `ss-server` is unavailable.
+ * then drives [ShadowsocksClient] directly, NOT the TUN engine or Android VpnService. Runs with
+ * and without a salt prefix. Opt in with -PliveTransportTests=true; skips if ss-server is unavailable.
  */
 class ShadowsocksLiveTrafficTest {
 
@@ -87,6 +87,7 @@ class ShadowsocksLiveTrafficTest {
     }
 
     private fun runServerAndFetch(cipher: Cipher, prefix: ByteArray?) {
+        assumeTrue("live transport tests are opt-in", System.getProperty("outshake.liveTests") == "true")
         val bin = ssServerBin()
         assumeTrue("ss-server not installed; skipping live traffic test", bin != null)
 

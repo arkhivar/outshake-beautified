@@ -13,8 +13,8 @@ import java.security.SecureRandom
  * A fresh salt is generated for every outgoing packet, the AEAD nonce is 12 zero bytes, and there
  * is a single seal/open per datagram (no length-prefixed chunking, unlike the TCP stream).
  *
- * The Outline prefix (PrefixSaltGenerator) applies to the *TCP* salt only, so it is deliberately
- * NOT used here — UDP salts stay fully random. See [ShadowsocksEncryptor] for the TCP path.
+     * Outshake supports URL-style TCP prefixes only; UDP salts stay fully random. Outline's richer
+     * dynamic configuration can specify UDP prefixes, which Outshake rejects rather than ignoring.
  *
  * Pure functions — fully unit-testable on the JVM.
  */

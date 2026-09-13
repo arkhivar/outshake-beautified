@@ -9,7 +9,7 @@ import kotlin.math.sqrt
 
 /**
  * Detects deliberate shakes via the accelerometer. Ignores casual motion using a g-force
- * threshold and enforces a cooldown so one shake produces exactly one toggle.
+ * threshold and enforces a cooldown to reduce repeated toggle requests.
  */
 class ShakeDetector(
     private var thresholdG: Float = 2.7f,

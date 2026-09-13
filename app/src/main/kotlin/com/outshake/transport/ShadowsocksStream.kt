@@ -1,6 +1,7 @@
 package com.outshake.transport
 
 import com.outshake.config.Cipher
+import com.outshake.config.PrefixPolicy
 import java.io.EOFException
 import java.io.InputStream
 import java.io.OutputStream
@@ -23,12 +24,11 @@ class ShadowsocksEncryptor(
     private var saltSent = false
 
     init {
+        // Also validate here for callers that bypass key import (including saved profiles).
+        require((prefix?.size ?: 0) <= PrefixPolicy.maxBytes(cipher)) {
+            "Prefix leaves insufficient random salt bytes"
+        }
         if (prefix != null) {
-            if (prefix.size > cipher.saltSize) {
-                throw IllegalArgumentException(
-                    "Prefix (${prefix.size} bytes) is longer than the ${cipher.saltSize}-byte salt"
-                )
-            }
             System.arraycopy(prefix, 0, salt, 0, prefix.size)
         }
         subkey = ShadowsocksCrypto.hkdfSha1(masterKey, salt, cipher.keySize)

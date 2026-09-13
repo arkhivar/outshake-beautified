@@ -53,3 +53,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 }
+
+// Live loopback transport tests are opt-in; ordinary unit tests require no local SS server.
+tasks.withType<Test>().configureEach {
+    systemProperty("outshake.liveTests", providers.gradleProperty("liveTransportTests").orElse("false").get())
+}

@@ -1,6 +1,6 @@
 <resources>
     <!-- One fixed theme (not DayNight): reads well in both day and night use. -->
-    <style name="Theme.Outshake" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Base.Theme.Outshake" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/accent</item>
         <item name="colorOnPrimary">@color/on_accent</item>
         <item name="colorPrimaryContainer">@color/accent</item>
@@ -25,6 +25,6 @@
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/background</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar">true</item>
     </style>
+    <style name="Theme.Outshake" parent="Base.Theme.Outshake" />
 </resources>

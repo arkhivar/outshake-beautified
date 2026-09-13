@@ -1,6 +1,7 @@
 package com.outshake.transport
 
 import com.outshake.config.TransportConfig
+import com.outshake.config.PrefixPolicy
 import java.io.BufferedInputStream
 import java.io.OutputStream
 import java.net.Socket
@@ -30,6 +31,8 @@ class ShadowsocksTcpConnection(
 
 /** Creates prefix-aware Shadowsocks connections for a given transport config. */
 class ShadowsocksClient(private val config: TransportConfig) {
+
+    init { PrefixPolicy.validate(config.cipher, config.prefix) }
 
     private val masterKey: ByteArray =
         ShadowsocksCrypto.deriveMasterKey(config.password, config.cipher.keySize)

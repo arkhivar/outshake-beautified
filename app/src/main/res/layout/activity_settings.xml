@@ -59,7 +59,7 @@
             android:paddingTop="8dp"
             android:textColor="@color/on_surface_secondary"
             android:textSize="12sp"
-            android:text="Lower = easier to trigger. A ~5s cooldown prevents repeated toggles. Shake detection keeps running in the background (a quiet notification shows while active) and plays a short shaker sound plus an on-screen message when it toggles the VPN." />
+            android:text="Lower = easier to trigger. A ~5s cooldown reduces repeated toggles. Background detection is best-effort and may stop during sleep or battery restrictions. The sound and message acknowledge a request, not a working VPN connection." />
 
         <View
             android:layout_width="match_parent"

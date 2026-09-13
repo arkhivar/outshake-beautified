@@ -281,8 +281,8 @@ class OutshakeVpnService : VpnService() {
             @Suppress("DEPRECATION") Notification.Builder(this)
         }
         return builder
-            .setContentTitle("Outshake connected")
-            .setContentText("Tunneling via $profileName")
+            .setContentTitle("Outshake VPN service")
+            .setContentText("Profile: $profileName — open app for status")
             .setSmallIcon(R.drawable.ic_launcher)
             .setColor(ContextCompat.getColor(this, R.color.accent))
             .setContentIntent(pending)

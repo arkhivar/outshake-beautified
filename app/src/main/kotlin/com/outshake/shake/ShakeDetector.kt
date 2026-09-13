@@ -12,7 +12,9 @@ import kotlin.math.sqrt
  * threshold and enforces a cooldown so one shake produces exactly one toggle.
  */
 class ShakeDetector(
-    private var thresholdG: Float = 2.7f,
+    // Written from the main thread via setSensitivity while sensor callbacks read it on the
+    // sensor (binder or HandlerThread) thread — @Volatile keeps that cross-thread read fresh.
+    @Volatile private var thresholdG: Float = 2.7f,
     private val cooldownMs: Long = COOLDOWN_MS,
     private val requiredHits: Int = 2,
     private val onShake: () -> Unit,
@@ -52,10 +54,18 @@ class ShakeDetector(
         /** One shake = one toggle for this long, so a single shake can't rapidly flip state. */
         const val COOLDOWN_MS = 5000L
 
-        fun register(context: Context, detector: ShakeDetector): Boolean {
+        fun register(context: Context, detector: ShakeDetector): Boolean =
+            register(context, detector, handler = null)
+
+        /**
+         * Register on a dedicated [android.os.Handler]'s thread when [handler] is given, so sensor
+         * callbacks don't compete with UI work on the main thread; without one, events are
+         * delivered on the main thread (legacy behavior).
+         */
+        fun register(context: Context, detector: ShakeDetector, handler: android.os.Handler?): Boolean {
             val sm = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
             val sensor = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) ?: return false
-            return sm.registerListener(detector, sensor, SensorManager.SENSOR_DELAY_GAME)
+            return sm.registerListener(detector, sensor, SensorManager.SENSOR_DELAY_GAME, handler)
         }
 
         fun unregister(context: Context, detector: ShakeDetector) {

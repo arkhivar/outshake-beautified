@@ -1,15 +1,18 @@
 package com.outshake.ui
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.outshake.R
 import com.outshake.config.Profile
 import com.outshake.config.ProfileImporter
@@ -28,9 +31,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var store: ProfileStore
     private lateinit var adapter: ProfileAdapter
 
-    /** Guards the switch listener while we set its state programmatically from the StateFlow. */
-    private var bindingSwitch = false
-
     private val requestNotifications =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* best effort */ }
 
@@ -38,15 +38,22 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             store.activeProfile()?.let { ConnectionManager.connect(this, it.id) }
         } else {
-            Toast.makeText(this, "VPN permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.vpn_permission_denied, Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        store = ProfileStore(this)
+
+        // First-run gate: onboarding handles the permission priming flow. Main stays on the
+        // back stack so returning from onboarding lands here.
+        if (!store.onboardingComplete) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        store = ProfileStore(this)
 
         adapter = ProfileAdapter()
         binding.profileList.layoutManager = LinearLayoutManager(this)
@@ -54,16 +61,17 @@ class MainActivity : AppCompatActivity() {
 
         binding.addButton.setOnClickListener { startActivity(Intent(this, ImportActivity::class.java)) }
         binding.settingsButton.setOnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) }
-        binding.connectSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (bindingSwitch) return@setOnCheckedChangeListener
-            onUserToggle(isChecked)
+        binding.connectButton.setOnClickListener {
+            onUserToggle(!isOn(ConnectionManager.state.value))
         }
 
         lifecycleScope.launch {
             ConnectionManager.state.collect { render(it) }
         }
 
-        ensureNotificationPermission()
+        // Onboarding asks for notifications on first run; keep this as a fallback for users
+        // who skipped it there.
+        if (store.onboardingComplete) ensureNotificationPermission()
     }
 
     override fun onResume() {
@@ -83,13 +91,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** Called only for genuine user flips of the big toggle (programmatic changes are guarded). */
+    /** True while the VPN is up or coming up (the hero button acts as "disconnect" then). */
+    private fun isOn(state: ConnectionManager.State): Boolean = when (state) {
+        ConnectionManager.State.CONNECTED,
+        ConnectionManager.State.CONNECTING,
+        ConnectionManager.State.RECONNECTING -> true
+        else -> false
+    }
+
+    /** Called only for genuine user taps of the hero connect button. */
     private fun onUserToggle(wantOn: Boolean) {
         if (wantOn) {
             val active = store.activeProfile()
             if (active == null) {
-                Toast.makeText(this, "Select or import a profile first", Toast.LENGTH_SHORT).show()
-                render(ConnectionManager.state.value) // snap the switch back to the true state
+                Toast.makeText(this, R.string.select_profile_first, Toast.LENGTH_SHORT).show()
+                render(ConnectionManager.state.value)
                 return
             }
             val prepare = VpnService.prepare(this)
@@ -103,20 +119,23 @@ class MainActivity : AppCompatActivity() {
     private fun refreshProfiles() {
         val profiles = store.getProfiles()
         adapter.submit(profiles, store.activeProfileId)
-        binding.emptyText.visibility = if (profiles.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
+        binding.emptyState.visibility = if (profiles.isEmpty()) View.VISIBLE else View.GONE
         val active = store.activeProfile()
-        binding.activeText.text = active?.let { "Active: ${it.name}" } ?: "No active profile"
+        binding.activeText.text = active?.let { getString(R.string.active_profile_fmt, it.name) }
+            ?: getString(R.string.no_active_profile)
     }
 
     private fun render(state: ConnectionManager.State) {
-        binding.statusText.text = when (state) {
-            ConnectionManager.State.DISCONNECTED -> "Disconnected"
-            ConnectionManager.State.CONNECTING -> "Connecting…"
-            ConnectionManager.State.CONNECTED -> "Connected"
-            ConnectionManager.State.RECONNECTING -> "Reconnecting…"
-            ConnectionManager.State.DISCONNECTING -> "Disconnecting…"
-            ConnectionManager.State.ERROR -> "Error"
-        }
+        binding.statusText.text = getString(
+            when (state) {
+                ConnectionManager.State.DISCONNECTED -> R.string.status_disconnected
+                ConnectionManager.State.CONNECTING -> R.string.status_connecting
+                ConnectionManager.State.CONNECTED -> R.string.status_connected
+                ConnectionManager.State.RECONNECTING -> R.string.status_reconnecting
+                ConnectionManager.State.DISCONNECTING -> R.string.status_disconnecting
+                ConnectionManager.State.ERROR -> R.string.status_error
+            }
+        )
         val statusColor = when (state) {
             ConnectionManager.State.CONNECTED -> R.color.accent
             ConnectionManager.State.ERROR -> R.color.error
@@ -124,30 +143,32 @@ class MainActivity : AppCompatActivity() {
         }
         binding.statusText.setTextColor(getColor(statusColor))
 
-        // Transitions are intermediate: disable input and show progress; the switch reflects intent.
+        // Transitions are intermediate: disable input and show the progress ring.
         val transitioning = state == ConnectionManager.State.CONNECTING ||
             state == ConnectionManager.State.RECONNECTING ||
             state == ConnectionManager.State.DISCONNECTING
-        val on = when (state) {
-            ConnectionManager.State.CONNECTED,
-            ConnectionManager.State.CONNECTING,
-            ConnectionManager.State.RECONNECTING -> true
-            else -> false
-        }
+        val on = isOn(state)
 
-        bindingSwitch = true
-        binding.connectSwitch.isChecked = on
-        bindingSwitch = false
-        binding.connectSwitch.isEnabled = !transitioning
-        binding.connectProgress.visibility =
-            if (transitioning) android.view.View.VISIBLE else android.view.View.GONE
+        binding.connectButton.isEnabled = !transitioning
+        binding.connectProgress.visibility = if (transitioning) View.VISIBLE else View.GONE
+
+        // Connected: filled teal circle with a shield; otherwise raised circle with power icon.
+        binding.connectButton.setIconResource(if (on) R.drawable.ic_shield_check else R.drawable.ic_power)
+        binding.connectButton.backgroundTintList =
+            ColorStateList.valueOf(getColor(if (on) R.color.accent else R.color.surface_raised))
+        binding.connectButton.iconTint =
+            ColorStateList.valueOf(getColor(if (on) R.color.on_accent else R.color.accent))
+        binding.connectButton.contentDescription =
+            getString(if (on) R.string.cd_disconnect_vpn else R.string.cd_connect_vpn)
+        binding.connectHint.text =
+            getString(if (on) R.string.tap_to_disconnect else R.string.tap_to_connect)
 
         val err = ConnectionManager.lastError
         if (state == ConnectionManager.State.ERROR && err != null) {
-            binding.errorText.visibility = android.view.View.VISIBLE
+            binding.errorText.visibility = View.VISIBLE
             binding.errorText.text = err
         } else {
-            binding.errorText.visibility = android.view.View.GONE
+            binding.errorText.visibility = View.GONE
         }
     }
 
@@ -177,31 +198,48 @@ class MainActivity : AppCompatActivity() {
             holder.b.detailText.text = "${p.sourceType.name.lowercase()} · ${p.transport.cipher.id}$prefix"
             holder.b.activeRadio.isChecked = p.id == activeId
             holder.b.refreshButton.visibility =
-                if (p.sourceType == com.outshake.config.SourceType.DYNAMIC) android.view.View.VISIBLE
-                else android.view.View.GONE
+                if (p.sourceType == com.outshake.config.SourceType.DYNAMIC) View.VISIBLE
+                else View.GONE
 
             holder.b.root.setOnClickListener {
                 store.activeProfileId = p.id
                 refreshProfiles()
             }
-            holder.b.deleteButton.setOnClickListener {
-                store.delete(p.id)
-                refreshProfiles()
-            }
+            holder.b.deleteButton.setOnClickListener { confirmDelete(p) }
             holder.b.refreshButton.setOnClickListener { refreshDynamic(p) }
         }
     }
 
+    private fun confirmDelete(profile: Profile) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.delete_confirm_title, profile.name))
+            .setMessage(R.string.delete_confirm_message)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                store.delete(profile.id)
+                refreshProfiles()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
     private fun refreshDynamic(profile: Profile) {
-        Toast.makeText(this, "Refreshing…", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.refreshing, Toast.LENGTH_SHORT).show()
         lifecycleScope.launch {
             try {
                 val updated = withContext(Dispatchers.IO) { ProfileImporter.refresh(profile) }
                 store.addOrUpdate(updated)
                 refreshProfiles()
-                Toast.makeText(this@MainActivity, "Updated ${updated.name}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.profile_updated_fmt, updated.name),
+                    Toast.LENGTH_SHORT
+                ).show()
             } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Refresh failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.refresh_failed_fmt, e.message ?: ""),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }

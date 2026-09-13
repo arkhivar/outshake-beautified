@@ -10,100 +10,165 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="24dp">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings"
-            android:textColor="@color/on_surface"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:paddingBottom="24dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="16dp">
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/shakeSwitch"
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="-12dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/on_surface"
+                android:contentDescription="@string/cd_back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:text="@string/settings"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textColor="@color/on_surface"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Shake gesture section -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/shake_toggle"
-            android:textColor="@color/on_surface"
-            android:textSize="16sp"
-            app:trackTint="@color/switch_track_tint"
-            app:thumbTint="@color/switch_thumb_tint" />
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/surface_raised">
 
-        <TextView
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_section_shake"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="@color/accent"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/shakeSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:minHeight="48dp"
+                    android:text="@string/shake_toggle"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/shake_sensitivity"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface" />
+
+                <TextView
+                    android:id="@+id/sensitivityValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="@color/on_surface_secondary" />
+
+                <SeekBar
+                    android:id="@+id/sensitivitySeek"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:minHeight="48dp"
+                    android:max="100"
+                    android:progressTint="@color/accent"
+                    android:thumbTint="@color/accent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/shake_explainer"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="@color/on_surface_secondary" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/vibrateSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:minHeight="48dp"
+                    android:text="@string/vibrate_on_toggle"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/vibrate_explainer"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="@color/on_surface_secondary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Connection section -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/shake_sensitivity"
-            android:textColor="@color/on_surface"
-            android:paddingTop="24dp" />
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/surface_raised">
 
-        <TextView
-            android:id="@+id/sensitivityValue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/on_surface_secondary"
-            android:textSize="12sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-        <SeekBar
-            android:id="@+id/sensitivitySeek"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:progressTint="@color/accent"
-            android:thumbTint="@color/accent"
-            android:max="100" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_section_connection"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="@color/accent"
+                    android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:textColor="@color/on_surface_secondary"
-            android:textSize="12sp"
-            android:text="Lower = easier to trigger. A ~5s cooldown prevents repeated toggles. Shake detection keeps running in the background (a quiet notification shows while active) and plays a short shaker sound plus an on-screen message when it toggles the VPN." />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/bootSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:minHeight="48dp"
+                    android:text="@string/connect_on_boot"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="8dp"
-            android:background="@color/outline" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/vibrateSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="16dp"
-            android:text="Vibrate on toggle"
-            android:textColor="@color/on_surface"
-            android:textSize="16sp"
-            app:trackTint="@color/switch_track_tint"
-            app:thumbTint="@color/switch_thumb_tint" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:textColor="@color/on_surface_secondary"
-            android:textSize="12sp"
-            android:text="Feel a short tick when the VPN toggles — one tap for on, a double tap for off. Fires whether you toggle by shake, the switch, or the quick-settings tile." />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/bootSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="24dp"
-            android:text="Connect on boot"
-            android:textColor="@color/on_surface"
-            android:textSize="16sp"
-            app:trackTint="@color/switch_track_tint"
-            app:thumbTint="@color/switch_thumb_tint" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:textColor="@color/on_surface_secondary"
-            android:textSize="12sp"
-            android:text="Automatically connect the active profile after the device restarts. VPN permission must already be granted (open the app once and connect); if it isn't, a notification will ask you to grant it." />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/boot_explainer"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="@color/on_surface_secondary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </ScrollView>

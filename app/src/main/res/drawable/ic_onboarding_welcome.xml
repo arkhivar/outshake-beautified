@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Shield with a shake/pulse waveform cut through it -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M60,12 L94,25 V58 C94,81.5 79.5,96.5 60,106 C40.5,96.5 26,81.5 26,58 V25 Z M40,54h12l5,-12l8,24l5.5,-12H82v6H70.5L65,75 56.5,51 51.5,60H40z" />
+</vector>

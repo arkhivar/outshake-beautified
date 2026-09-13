@@ -65,7 +65,7 @@ class BootReceiver : BroadcastReceiver() {
         val n = builder
             .setContentTitle("Outshake")
             .setContentText("Open Outshake to grant VPN permission for connect-on-boot")
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setColor(ContextCompat.getColor(context, R.color.accent))
             .setContentIntent(pending)
             .setAutoCancel(true)

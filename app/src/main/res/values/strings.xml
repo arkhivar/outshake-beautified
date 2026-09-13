@@ -1,15 +1,79 @@
 <resources>
     <string name="app_name">Outshake</string>
-    <string name="connect">Connect</string>
-    <string name="disconnect">Disconnect</string>
+
+    <!-- Main screen -->
+    <string name="status_disconnected">Not connected</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_connected">You\'re protected</string>
+    <string name="status_reconnecting">Reconnecting…</string>
+    <string name="status_disconnecting">Disconnecting…</string>
+    <string name="status_error">Something went wrong</string>
+    <string name="tap_to_connect">Tap to connect</string>
+    <string name="tap_to_disconnect">Tap to disconnect</string>
+    <string name="cd_connect_vpn">Connect VPN</string>
+    <string name="cd_disconnect_vpn">Disconnect VPN</string>
+    <string name="no_active_profile">No active profile</string>
+    <string name="active_profile_fmt">Active: %1$s</string>
+    <string name="profiles_header">Profiles</string>
+    <string name="empty_state_title">No servers yet</string>
+    <string name="empty_state_message">Add your first server to get started — import an ss:// or ssconf:// key.</string>
     <string name="add_profile">Add profile</string>
     <string name="settings">Settings</string>
+    <string name="vpn_permission_denied">VPN permission denied</string>
+    <string name="select_profile_first">Select or import a profile first</string>
+
+    <!-- Profile rows -->
+    <string name="delete">Delete</string>
+    <string name="refresh">Refresh</string>
+    <string name="cd_refresh_profile">Refresh profile</string>
+    <string name="cd_delete_profile">Delete profile</string>
+    <string name="delete_confirm_title">Delete %1$s?</string>
+    <string name="delete_confirm_message">This profile will be removed permanently.</string>
+    <string name="cancel">Cancel</string>
+    <string name="refreshing">Refreshing…</string>
+    <string name="profile_updated_fmt">Updated %1$s</string>
+    <string name="refresh_failed_fmt">Refresh failed: %1$s</string>
+
+    <!-- Import screen -->
     <string name="import_title">Import profile</string>
     <string name="key_hint">Paste ss:// or ssconf:// key</string>
     <string name="import_action">Import</string>
+    <string name="paste_from_clipboard">Paste from clipboard</string>
+    <string name="import_empty_key">Enter an ss:// or ssconf:// key</string>
+    <string name="import_failed">Import failed</string>
+    <string name="cd_back">Back</string>
+
+    <!-- Settings screen -->
+    <string name="settings_section_shake">Shake gesture</string>
+    <string name="settings_section_connection">Connection</string>
     <string name="shake_toggle">Shake to connect / disconnect</string>
     <string name="shake_sensitivity">Shake sensitivity</string>
-    <string name="no_profiles">No profiles yet. Tap \"Add profile\" to import an ss:// or ssconf:// key.</string>
-    <string name="delete">Delete</string>
-    <string name="refresh">Refresh</string>
+    <string name="shake_explainer">Lower = easier to trigger. A ~5s cooldown prevents repeated toggles. Shake detection keeps running in the background (a quiet notification shows while active) and plays a short shaker sound plus an on-screen message when it toggles the VPN.</string>
+    <string name="vibrate_on_toggle">Vibrate on toggle</string>
+    <string name="vibrate_explainer">Feel a short tick when the VPN toggles — one tap for on, a double tap for off. Fires whether you toggle by shake, the button, or the quick-settings tile.</string>
+    <string name="connect_on_boot">Connect on boot</string>
+    <string name="boot_explainer">Automatically connect the active profile after the device restarts. VPN permission must already be granted (open the app once and connect); if it isn\'t, a notification will ask you to grant it.</string>
+    <string name="sensitivity_high">High (easy to trigger)</string>
+    <string name="sensitivity_low">Low (firm shake required)</string>
+    <string name="sensitivity_medium">Medium</string>
+    <string name="sensitivity_value_fmt">%1$s — threshold %2$.1f g</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Welcome to Outshake</string>
+    <string name="onboarding_welcome_body">A VPN you toggle by shaking your phone. One shake connects you — another disconnects. No digging through settings.</string>
+    <string name="onboarding_get_started">Get started</string>
+    <string name="onboarding_notifications_title">Keep the shake listener alive</string>
+    <string name="onboarding_notifications_body">Outshake listens for shakes in the background so the gesture works from any screen. Android requires a quiet ongoing notification for that — allow notifications so shake-to-toggle keeps working.</string>
+    <string name="onboarding_allow_notifications">Allow notifications</string>
+    <string name="onboarding_battery_title">Allow background activity</string>
+    <string name="onboarding_battery_body">Your phone may put apps to sleep to save battery, which can stop the shake listener. Excluding Outshake from battery optimizations keeps it reliable.</string>
+    <string name="onboarding_allow_background">Allow background activity</string>
+    <string name="onboarding_battery_granted">Background activity allowed</string>
+    <string name="onboarding_battery_note">Note: some manufacturers (Xiaomi, Oppo, Vivo and others) also require enabling "Autostart" for Outshake in system settings.</string>
+    <string name="onboarding_shake_title">Shake to toggle</string>
+    <string name="onboarding_shake_body">Give your phone a quick double-shake to connect or disconnect. If it triggers too easily — or not at all — adjust the sensitivity in Settings.</string>
+    <string name="onboarding_done">Done</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_skip">Skip for now</string>
+    <string name="onboarding_settings_unavailable">System settings unavailable on this device</string>
 </resources>

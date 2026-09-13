@@ -3,11 +3,10 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Legacy static launcher icon (referenced by the manifest and services as
-         @drawable/ic_launcher). Teal field, white shield, shake waveform. -->
+    <!-- Pre-API-26 round fallback: circular teal badge with shield + waveform. -->
     <path
         android:fillColor="#01696F"
-        android:pathData="M0,0h108v108h-108z" />
+        android:pathData="M54,4a50,50 0 1,0 0.1,0z" />
     <path
         android:fillColor="#FFFFFFFF"
         android:pathData="M54,24 L79,34.5 V58 C79,74.5 68.5,84.5 54,92 C39.5,84.5 29,74.5 29,58 V34.5 Z" />

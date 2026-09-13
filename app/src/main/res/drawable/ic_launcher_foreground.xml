@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shield + shake waveform, kept inside the 66dp adaptive-icon safe zone -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,28 L76,37 V58 C76,72 66.5,81 54,88 C41.5,81 32,72 32,58 V37 Z" />
+    <path
+        android:strokeColor="#01696F"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M38,56h7l4.5,-9 7,18 4.5,-9h9" />
+</vector>

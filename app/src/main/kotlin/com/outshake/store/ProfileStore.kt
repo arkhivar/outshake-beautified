@@ -61,6 +61,11 @@ class ProfileStore(context: Context) {
         get() = prefs.getBoolean(KEY_CONNECT_ON_BOOT, false)
         set(value) = prefs.edit().putBoolean(KEY_CONNECT_ON_BOOT, value).apply()
 
+    /** True once the user has finished the first-run onboarding flow. OFF by default. */
+    var onboardingComplete: Boolean
+        get() = prefs.getBoolean(KEY_ONBOARDING_COMPLETE, false)
+        set(value) = prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETE, value).apply()
+
     /** Fire a short haptic tick at the accepted-toggle moment (same instant as the shake sound). ON by default. */
     var vibrateOnToggle: Boolean
         get() = prefs.getBoolean(KEY_VIBRATE, true)
@@ -113,6 +118,7 @@ class ProfileStore(context: Context) {
         private const val KEY_SHAKE = "shake_enabled"
         private const val KEY_SHAKE_SENS = "shake_sensitivity"
         private const val KEY_CONNECT_ON_BOOT = "connect_on_boot"
+        private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
         private const val KEY_SHOULD_CONNECT = "should_be_connected"
         private const val KEY_VIBRATE = "vibrate_on_toggle"
     }

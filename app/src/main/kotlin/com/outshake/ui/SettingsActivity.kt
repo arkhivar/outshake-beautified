@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.SeekBar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.outshake.R
 import com.outshake.databinding.ActivitySettingsBinding
 import com.outshake.shake.ShakeService
 import com.outshake.store.ProfileStore
@@ -26,6 +27,8 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         store = ProfileStore(this)
+
+        binding.backButton.setOnClickListener { finish() }
 
         binding.shakeSwitch.isChecked = store.shakeEnabled
         binding.shakeSwitch.setOnCheckedChangeListener { _, checked ->
@@ -57,9 +60,13 @@ class SettingsActivity : AppCompatActivity() {
                 val g = progressToG(progress)
                 store.shakeSensitivity = g
                 updateSensitivityLabel(g)
+                // Push the new threshold to a running ShakeService (no restart needed).
+                if (fromUser) ShakeService.sync(this@SettingsActivity)
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                ShakeService.sync(this@SettingsActivity)
+            }
         })
     }
 
@@ -76,11 +83,13 @@ class SettingsActivity : AppCompatActivity() {
     private fun gToProgress(g: Float): Int = (((maxG - g) / (maxG - minG)) * 100f).toInt().coerceIn(0, 100)
 
     private fun updateSensitivityLabel(g: Float) {
-        val label = when {
-            g <= 2.0f -> "High (easy to trigger)"
-            g >= 3.2f -> "Low (firm shake required)"
-            else -> "Medium"
-        }
-        binding.sensitivityValue.text = "$label — threshold ${"%.1f".format(g)}g"
+        val label = getString(
+            when {
+                g <= 2.0f -> R.string.sensitivity_high
+                g >= 3.2f -> R.string.sensitivity_low
+                else -> R.string.sensitivity_medium
+            }
+        )
+        binding.sensitivityValue.text = getString(R.string.sensitivity_value_fmt, label, g)
     }
 }

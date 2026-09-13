@@ -283,7 +283,7 @@ class OutshakeVpnService : VpnService() {
         return builder
             .setContentTitle("Outshake connected")
             .setContentText("Tunneling via $profileName")
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setColor(ContextCompat.getColor(this, R.color.accent))
             .setContentIntent(pending)
             .setOngoing(true)

@@ -1,5 +1,5 @@
 <resources>
-    <!-- Single calm warm-neutral palette, comfortable day and night. One accent (teal) + neutrals. -->
+    <!-- Warm-neutral palette (light). Dark counterparts live in values-night/colors.xml. -->
     <color name="background">#F7F6F2</color>
     <color name="surface">#F7F6F2</color>
     <color name="surface_raised">#FFFFFF</color>
@@ -8,6 +8,8 @@
     <color name="accent">#01696F</color>
     <color name="accent_pressed">#0C4E54</color>
     <color name="on_accent">#FFFFFF</color>
+    <color name="accent_container">#CDE7E9</color>
+    <color name="on_accent_container">#01353A</color>
     <color name="error">#A12C7B</color>
     <color name="on_error">#FFFFFF</color>
     <color name="success">#437A22</color>

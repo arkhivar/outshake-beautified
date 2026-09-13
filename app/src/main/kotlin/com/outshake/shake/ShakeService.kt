@@ -7,14 +7,16 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Build
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.widget.Toast
+import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.outshake.R
 import com.outshake.store.ProfileStore
@@ -26,10 +28,16 @@ import com.outshake.vpn.ConnectionManager
  * enabled — independent of VPN state and surviving activity destruction. On a recognized shake it
  * toggles the active profile via the shared [ConnectionManager] (no connect/disconnect logic here)
  * and gives immediate sound + toast feedback at the moment the toggle is accepted.
+ *
+ * While the accelerometer is registered a partial wake lock ("outshake:shake") keeps the CPU
+ * awake so the non-wake-up accelerometer keeps delivering events with the screen off; sensor
+ * callbacks run on a dedicated [HandlerThread] instead of the main thread.
  */
 class ShakeService : Service() {
 
     private var detector: ShakeDetector? = null
+    private var sensorThread: HandlerThread? = null
+    private var wakeLock: PowerManager.WakeLock? = null
     private var soundPool: SoundPool? = null
     private var onSoundId = 0
     private var offSoundId = 0
@@ -37,8 +45,40 @@ class ShakeService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onCreate() {
-        super.onCreate()
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Enabled-check FIRST: no notification, SoundPool, sensor, or wake-lock work may happen
+        // when shake mode is off.
+        val store = ProfileStore(this)
+        if (!store.shakeEnabled) {
+            // We may have been started via startForegroundService, which contractually requires a
+            // startForeground() call; post then immediately remove so nothing flashes in the shade.
+            if (detector == null) {
+                startForeground(NOTIFICATION_ID, buildNotification())
+            }
+            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        // Cheap live-sync: service already fully running — push the current sensitivity into the
+        // detector WITHOUT re-posting the notification, reloading SoundPool, or re-registering
+        // the sensor.
+        if (intent?.action == ACTION_SYNC && detector != null) {
+            detector?.setSensitivity(store.shakeSensitivity)
+            return START_STICKY
+        }
+
+        // First start (or full recovery after process death): heavy init happens only here.
+        startForeground(NOTIFICATION_ID, buildNotification())
+        ensureSoundPool()
+        registerDetector()
+        // START_STICKY: if the OS kills us under memory pressure, restart (while still enabled).
+        return START_STICKY
+    }
+
+    /** Loaded lazily on the enabled path so a pref-off start never pays for audio setup. */
+    private fun ensureSoundPool() {
+        if (soundPool != null) return
         val attrs = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT) // notification stream → muted in silent/vibrate
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -49,22 +89,35 @@ class ShakeService : Service() {
         soundPool = pool
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOTIFICATION_ID, buildNotification())
-        if (!ProfileStore(this).shakeEnabled) {
-            stopSelf()
-            return START_NOT_STICKY
-        }
-        registerDetector()
-        // START_STICKY: if the OS kills us under memory pressure, restart (while still enabled).
-        return START_STICKY
-    }
-
     private fun registerDetector() {
         if (detector != null) return
         val store = ProfileStore(this)
         val d = ShakeDetector(thresholdG = store.shakeSensitivity) { onShakeAccepted() }
-        if (ShakeDetector.register(this, d)) detector = d
+        // Sensor callbacks on a dedicated thread: keeps ~50 Hz sensor delivery off the main
+        // thread, which matters now that the CPU stays awake with the screen off.
+        val thread = HandlerThread("outshake-shake-sensor").apply { start() }
+        if (ShakeDetector.register(this, d, Handler(thread.looper))) {
+            detector = d
+            sensorThread = thread
+            acquireWakeLock()
+        } else {
+            thread.quit()
+        }
+    }
+
+    /** Keeps the CPU awake so accelerometer events keep flowing with the screen off. */
+    private fun acquireWakeLock() {
+        if (wakeLock?.isHeld == true) return
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG).apply {
+            setReferenceCounted(false)
+            acquire()
+        }
+    }
+
+    private fun releaseWakeLock() {
+        wakeLock?.let { if (it.isHeld) it.release() }
+        wakeLock = null
     }
 
     private fun onShakeAccepted() {
@@ -95,6 +148,9 @@ class ShakeService : Service() {
     override fun onDestroy() {
         detector?.let { ShakeDetector.unregister(this, it) }
         detector = null
+        sensorThread?.quitSafely()
+        sensorThread = null
+        releaseWakeLock()
         soundPool?.release()
         soundPool = null
         super.onDestroy()
@@ -120,7 +176,7 @@ class ShakeService : Service() {
         return builder
             .setContentTitle("Outshake")
             .setContentText("Shake detection active")
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setColor(ContextCompat.getColor(this, R.color.accent))
             .setContentIntent(pending)
             .setOngoing(true)
@@ -142,6 +198,14 @@ class ShakeService : Service() {
         private const val CHANNEL_ID = "outshake_shake"
         private const val NOTIFICATION_ID = 2
         private const val VOLUME = 0.35f
+        private const val WAKE_LOCK_TAG = "outshake:shake"
+
+        /**
+         * Internal action for [sync]: when the service is already running it only re-reads the
+         * preferences and pushes the live sensitivity into the detector — no restart, no
+         * notification flash, no sensor re-registration.
+         */
+        private const val ACTION_SYNC = "com.outshake.shake.action.SYNC"
 
         /** Start the service iff shake mode is enabled. Safe to call repeatedly (idempotent). */
         fun start(context: Context) {
@@ -155,9 +219,19 @@ class ShakeService : Service() {
             app.stopService(Intent(app, ShakeService::class.java))
         }
 
-        /** Reflect the current setting: start if enabled, stop if disabled. */
+        /**
+         * Reflect the current settings: stop if disabled; if enabled, start the service (full init
+         * on first start) or, when it is already running, cheaply push the saved sensitivity
+         * ([ProfileStore.shakeSensitivity]) into the live detector via [ACTION_SYNC].
+         */
         fun sync(context: Context) {
-            if (ProfileStore(context).shakeEnabled) start(context) else stop(context)
+            val app = context.applicationContext
+            if (!ProfileStore(app).shakeEnabled) {
+                stop(app)
+                return
+            }
+            val intent = Intent(app, ShakeService::class.java).setAction(ACTION_SYNC)
+            ContextCompat.startForegroundService(app, intent)
         }
     }
 }

@@ -1,16 +1,20 @@
 <resources>
-    <!-- One fixed theme (not DayNight): reads well in both day and night use. -->
-    <style name="Theme.Outshake" parent="Theme.Material3.Light.NoActionBar">
+    <!-- Base theme: full Material3 DayNight color + shape mapping.
+         Colors resolve from values/ or values-night/ automatically. -->
+    <style name="Theme.Outshake.Base" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/accent</item>
         <item name="colorOnPrimary">@color/on_accent</item>
-        <item name="colorPrimaryContainer">@color/accent</item>
-        <item name="colorOnPrimaryContainer">@color/on_accent</item>
-        <item name="colorSecondary">@color/on_surface_secondary</item>
+        <item name="colorPrimaryContainer">@color/accent_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_accent_container</item>
+        <item name="colorSecondary">@color/accent</item>
         <item name="colorOnSecondary">@color/on_accent</item>
+        <item name="colorSecondaryContainer">@color/accent_container</item>
+        <item name="colorOnSecondaryContainer">@color/on_accent_container</item>
 
         <item name="android:colorBackground">@color/background</item>
         <item name="colorSurface">@color/surface</item>
-        <item name="colorSurfaceVariant">@color/surface</item>
+        <!-- Cards/dialog sheets read as raised surfaces against the warm background. -->
+        <item name="colorSurfaceVariant">@color/surface_raised</item>
         <item name="colorOnSurface">@color/on_surface</item>
         <item name="colorOnSurfaceVariant">@color/on_surface_secondary</item>
 
@@ -24,6 +28,13 @@
         <item name="android:windowBackground">@color/background</item>
         <item name="android:statusBarColor">@color/background</item>
         <item name="android:navigationBarColor">@color/background</item>
+
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.Outshake.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.Outshake.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.Outshake.LargeComponent</item>
+    </style>
+
+    <style name="Theme.Outshake" parent="Theme.Outshake.Base">
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>

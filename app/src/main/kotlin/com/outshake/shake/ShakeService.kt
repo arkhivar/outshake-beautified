@@ -84,8 +84,8 @@ class ShakeService : Service() {
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
         val pool = SoundPool.Builder().setMaxStreams(1).setAudioAttributes(attrs).build()
-        onSoundId = pool.load(this, R.raw.shake_on, 1)
-        offSoundId = pool.load(this, R.raw.shake_off, 1)
+        onSoundId = pool.load(this, R.raw.coo_on, 1)
+        offSoundId = pool.load(this, R.raw.coo_off, 1)
         soundPool = pool
     }
 

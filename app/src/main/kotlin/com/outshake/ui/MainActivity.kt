@@ -1,11 +1,18 @@
 package com.outshake.ui
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.drawable.AnimationDrawable
+import android.media.AudioAttributes
+import android.media.SoundPool
 import android.net.VpnService
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +37,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var store: ProfileStore
     private lateinit var adapter: ProfileAdapter
+
+    /** Mascot animation-list resource currently shown; 0 until first render. */
+    private var mascotAnimRes = 0
+
+    /** Lazily created one-shot player for the tap coo; released in onDestroy. */
+    private var tapSoundPool: SoundPool? = null
+    private var tapSoundId = 0
+    private var hopAnimator: AnimatorSet? = null
 
     private val requestNotifications =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* best effort */ }
@@ -64,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         binding.connectButton.setOnClickListener {
             onUserToggle(!isOn(ConnectionManager.state.value))
         }
+        binding.mascotImage.setOnClickListener { onMascotTapped() }
 
         lifecycleScope.launch {
             ConnectionManager.state.collect { render(it) }
@@ -80,6 +96,87 @@ class MainActivity : AppCompatActivity() {
         render(ConnectionManager.state.value)
         // Shake detection runs in a foreground service (works while backgrounded); start if enabled.
         ShakeService.sync(this)
+        startMascotAnim()
+    }
+
+    override fun onPause() {
+        // AnimationDrawable keeps ticking while paused otherwise — stop it to save battery.
+        stopMascotAnim()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        hopAnimator?.cancel()
+        hopAnimator = null
+        tapSoundPool?.release()
+        tapSoundPool = null
+        super.onDestroy()
+    }
+
+    // ---- Pigeon mascot ----
+
+    /** Swap the mascot loop only when the target animation actually changes. */
+    private fun updateMascot(state: ConnectionManager.State) {
+        val animRes = if (state == ConnectionManager.State.CONNECTED) {
+            R.drawable.pigeon_peck_anim // fed and happy: pecking seeds
+        } else {
+            R.drawable.pigeon_hungry_anim // begging for a connection
+        }
+        if (animRes != mascotAnimRes) {
+            stopMascotAnim()
+            mascotAnimRes = animRes
+            binding.mascotImage.setImageResource(animRes)
+        }
+        startMascotAnim()
+    }
+
+    private fun startMascotAnim() {
+        (binding.mascotImage.drawable as? AnimationDrawable)?.let {
+            if (!it.isRunning) it.start()
+        }
+    }
+
+    private fun stopMascotAnim() {
+        (binding.mascotImage.drawable as? AnimationDrawable)?.stop()
+    }
+
+    /** Curious coo + a little hop with a head-tilt wiggle. */
+    private fun onMascotTapped() {
+        playTapCoo()
+        hopAnimator?.cancel()
+        val img = binding.mascotImage
+        val hopPx = 24f * resources.displayMetrics.density
+        val up = ObjectAnimator.ofFloat(img, View.TRANSLATION_Y, 0f, -hopPx).apply {
+            duration = 150
+            interpolator = DecelerateInterpolator()
+        }
+        val down = ObjectAnimator.ofFloat(img, View.TRANSLATION_Y, -hopPx, 0f).apply {
+            duration = 150
+            interpolator = AccelerateInterpolator()
+        }
+        val wiggle = ObjectAnimator.ofFloat(img, View.ROTATION, 0f, -6f, 5f, 0f).apply {
+            duration = 300
+        }
+        hopAnimator = AnimatorSet().apply {
+            play(up).before(down)
+            play(wiggle).with(up)
+            start()
+        }
+    }
+
+    /** Lazily builds the one-shot SoundPool (notification stream, muted in silent mode). */
+    private fun playTapCoo() {
+        val pool = tapSoundPool ?: run {
+            val attrs = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+            SoundPool.Builder().setMaxStreams(1).setAudioAttributes(attrs).build().also {
+                tapSoundId = it.load(this, R.raw.coo_tap, 1)
+                tapSoundPool = it
+            }
+        }
+        pool.play(tapSoundId, TAP_COO_VOLUME, TAP_COO_VOLUME, 1, 0, 1f)
     }
 
     private fun ensureNotificationPermission() {
@@ -126,6 +223,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun render(state: ConnectionManager.State) {
+        updateMascot(state)
         binding.statusText.text = getString(
             when (state) {
                 ConnectionManager.State.DISCONNECTED -> R.string.status_disconnected
@@ -242,5 +340,10 @@ class MainActivity : AppCompatActivity() {
                 ).show()
             }
         }
+    }
+
+    private companion object {
+        /** Half volume is plenty for an in-app tap cue (ShakeService uses 0.35 for shake feedback). */
+        const val TAP_COO_VOLUME = 0.5f
     }
 }

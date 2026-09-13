@@ -12,6 +12,7 @@
     <string name="tap_to_disconnect">Tap to disconnect</string>
     <string name="cd_connect_vpn">Connect VPN</string>
     <string name="cd_disconnect_vpn">Disconnect VPN</string>
+    <string name="cd_pigeon_mascot">Outshake pigeon mascot — tap for a coo</string>
     <string name="no_active_profile">No active profile</string>
     <string name="active_profile_fmt">Active: %1$s</string>
     <string name="profiles_header">Profiles</string>

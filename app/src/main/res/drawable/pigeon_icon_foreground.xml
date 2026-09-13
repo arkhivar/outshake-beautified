@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive-icon foreground for the pigeon head. The 108dp canvas only guarantees the central
+     ~72dp circle; the 512px head art fills edge-to-edge, so inset it ~20dp per side (~63% of the
+     canvas) to keep the head inside the safe zone on circular/squircle masks. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:left="20dp"
+        android:top="20dp"
+        android:right="20dp"
+        android:bottom="20dp">
+        <bitmap
+            android:src="@drawable/pigeon_head"
+            android:gravity="center" />
+    </item>
+</layer-list>

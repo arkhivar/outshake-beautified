@@ -36,8 +36,7 @@
             <ImageView
                 android:layout_width="140dp"
                 android:layout_height="140dp"
-                android:src="@drawable/ic_onboarding_welcome"
-                app:tint="@color/accent"
+                android:src="@drawable/pigeon_hungry_up"
                 android:importantForAccessibility="no" />
 
             <TextView
@@ -182,8 +181,7 @@
             <ImageView
                 android:layout_width="104dp"
                 android:layout_height="104dp"
-                android:src="@drawable/ic_shake"
-                app:tint="@color/accent"
+                android:src="@drawable/pigeon_peck_down"
                 android:importantForAccessibility="no" />
 
             <TextView

@@ -4,6 +4,9 @@ A small, Android-native Kotlin Shadowsocks VPN client for personal use. It accep
 a **subset** of Outline access keys and configurations; it is not the official
 Outline client and does not embed Outline's tunnel engine.
 
+See [AUDIT.md](AUDIT.md) for the dated audit/review log (findings, deferred risks,
+verification history). Read it before proposing changes.
+
 ## What it does
 
 - Imports static `ss://` and dynamic HTTPS-backed `ssconf://` profiles.

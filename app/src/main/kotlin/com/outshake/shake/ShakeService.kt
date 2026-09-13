@@ -122,10 +122,17 @@ class ShakeService : Service() {
 
     private fun onShakeAccepted() {
         // toggle() is the single source of truth; it returns the action it took.
-        when (feedbackFor(ConnectionManager.toggle(this))) {
-            Feedback.VPN_ON -> feedback(onSoundId, "VPN activated")
-            Feedback.VPN_OFF -> feedback(offSoundId, "VPN off")
-            Feedback.MESSAGE -> toast("No active profile — open Outshake to pick one")
+        val result = try {
+            ConnectionManager.toggle(this)
+        } catch (_: Exception) {
+            ConnectionManager.onError("VPN request failed — open Outshake to retry")
+            toast("VPN request failed — open Outshake to retry")
+            return
+        }
+        when (feedbackFor(result)) {
+            Feedback.VPN_ON -> feedback(onSoundId, feedbackMessage(result)!!)
+            Feedback.VPN_OFF -> feedback(offSoundId, feedbackMessage(result)!!)
+            Feedback.MESSAGE -> toast(feedbackMessage(result)!!)
             Feedback.NONE -> { /* busy mid-transition: shake not accepted, no feedback */ }
         }
     }
@@ -191,8 +198,17 @@ class ShakeService : Service() {
         fun feedbackFor(toggleResult: String): Feedback = when (toggleResult) {
             "Connecting" -> Feedback.VPN_ON
             "Disconnecting" -> Feedback.VPN_OFF
-            "No active profile" -> Feedback.MESSAGE
+            "No active profile", "VPN permission required" -> Feedback.MESSAGE
             else -> Feedback.NONE
+        }
+
+        /** Immediate feedback acknowledges the request, never tunnel health or completion. */
+        fun feedbackMessage(toggleResult: String): String? = when (toggleResult) {
+            "Connecting" -> "VPN connection requested"
+            "Disconnecting" -> "VPN disconnect requested"
+            "No active profile" -> "No active profile — open Outshake to pick one"
+            "VPN permission required" -> "Open Outshake to grant VPN permission"
+            else -> null
         }
 
         private const val CHANNEL_ID = "outshake_shake"

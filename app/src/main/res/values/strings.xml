@@ -48,7 +48,7 @@
     <string name="settings_section_connection">Connection</string>
     <string name="shake_toggle">Shake to connect / disconnect</string>
     <string name="shake_sensitivity">Shake sensitivity</string>
-    <string name="shake_explainer">Lower = easier to trigger. A ~5s cooldown prevents repeated toggles. Shake detection keeps running in the background (a quiet notification shows while active) and plays a short shaker sound plus an on-screen message when it toggles the VPN.</string>
+    <string name="shake_explainer">Lower = easier to trigger. A ~5s cooldown reduces repeated toggles. Background detection is best-effort and may stop during sleep or battery restrictions. The sound and message acknowledge a request, not a working VPN connection.</string>
     <string name="vibrate_on_toggle">Vibrate on toggle</string>
     <string name="vibrate_explainer">Feel a short tick when the VPN toggles — one tap for on, a double tap for off. Fires whether you toggle by shake, the button, or the quick-settings tile.</string>
     <string name="connect_on_boot">Connect on boot</string>

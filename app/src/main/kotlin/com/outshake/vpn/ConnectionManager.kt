@@ -2,6 +2,7 @@ package com.outshake.vpn
 
 import android.content.Context
 import android.content.Intent
+import android.net.VpnService
 import android.os.Build
 import com.outshake.shake.Haptics
 import com.outshake.store.ProfileStore
@@ -59,6 +60,7 @@ object ConnectionManager {
             State.DISCONNECTED, State.ERROR -> {
                 val active = ProfileStore(context).activeProfile()
                     ?: return "No active profile"
+                if (VpnService.prepare(context) != null) return "VPN permission required"
                 connect(context, active.id); "Connecting"
             }
             else -> "Busy — ignoring shake"

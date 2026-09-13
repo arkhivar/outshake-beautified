@@ -1,7 +1,11 @@
 package com.outshake.config
 
 import org.yaml.snakeyaml.Yaml
-import java.util.Base64
+import org.yaml.snakeyaml.LoaderOptions
+import org.yaml.snakeyaml.constructor.SafeConstructor
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
+import org.bouncycastle.util.encoders.Base64
 
 /**
  * Parses Outline-compatible access keys into a normalized [ParsedConfig].
@@ -41,7 +45,7 @@ object ConfigParser {
         }
     }
 
-    /** SIP002: ss://base64(method:pass)@host:port/?plugin&prefix ... or ss://method:pass@host:port */
+    /** SIP002: ss://base64(method:pass)@host:port/?prefix=... or ss://method:pass@host:port. */
     private fun parseSip002(body: String, name: String): ParsedConfig {
         val at = body.lastIndexOf('@')
         val userInfoRaw = body.substring(0, at)
@@ -54,9 +58,12 @@ object ConfigParser {
             query = hostPart.substring(q + 1)
             hostPart = hostPart.substring(0, q)
         }
-        // Strip any trailing path (e.g. "/").
+        // SIP002 permits a trailing slash, not an arbitrary ignored transport path.
         val slash = hostPart.indexOf('/')
-        if (slash >= 0) hostPart = hostPart.substring(0, slash)
+        if (slash >= 0) {
+            if (hostPart.substring(slash) != "/") throw ConfigException("Unsupported access key path")
+            hostPart = hostPart.substring(0, slash)
+        }
 
         val methodPassword = decodeUserInfo(userInfoRaw)
         val colon = methodPassword.indexOf(':')
@@ -67,6 +74,7 @@ object ConfigParser {
         val (host, port) = splitHostPort(hostPart)
         val cipher = resolveCipher(method)
         val prefix = extractPrefixFromQuery(query)
+        PrefixPolicy.validate(cipher, prefix)
         return ParsedConfig(displayName(name, host, port), TransportConfig(host, port, cipher, password, prefix))
     }
 
@@ -113,7 +121,7 @@ object ConfigParser {
         val hash = rest.indexOf('#')
         if (hash >= 0) rest = rest.substring(0, hash)
         if (rest.isEmpty()) throw ConfigException("Empty ssconf:// key")
-        return "https://$rest"
+        return DynamicFetcher.validateUrl("https://$rest").toExternalForm()
     }
 
     /** Optional display-name hint from the ssconf fragment. */
@@ -127,19 +135,30 @@ object ConfigParser {
      * or a YAML document (including the newer Outline transport graph).
      */
     fun parseDynamicBody(body: String, nameHint: String = ""): ParsedConfig {
+        if (body.length > DynamicFetcher.MAX_BODY_BYTES) throw ConfigException("Dynamic config is too large")
         val text = body.trim()
         if (text.isEmpty()) throw ConfigException("Dynamic config was empty")
 
         if (text.startsWith("ss://", ignoreCase = true)) {
+            if (text.lineSequence().count { it.isNotBlank() } != 1) {
+                throw ConfigException("Dynamic config must contain exactly one ss:// key")
+            }
             val line = text.lineSequence().first { it.isNotBlank() }.trim()
             val parsed = parseStatic(line)
             return if (nameHint.isNotBlank()) parsed.copy(name = nameHint) else parsed
         }
 
         val loaded: Any = try {
-            Yaml().load<Any>(text)
+            val options = LoaderOptions().apply {
+                isAllowDuplicateKeys = false
+                maxAliasesForCollections = 0
+                nestingDepthLimit = 32
+                codePointLimit = DynamicFetcher.MAX_BODY_BYTES
+            }
+            Yaml(SafeConstructor(options)).load<Any>(text)
         } catch (e: Exception) {
-            throw ConfigException("Dynamic config is not valid JSON/YAML: ${e.message}")
+            // Parser diagnostics can contain whole source lines, including passwords.
+            throw ConfigException("Dynamic config is not valid or supported JSON/YAML")
         } ?: throw ConfigException("Dynamic config was empty")
 
         if (loaded !is Map<*, *>) {
@@ -148,27 +167,36 @@ object ConfigParser {
         return normalizeMap(loaded, nameHint)
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun normalizeMap(root: Map<*, *>, nameHint: String): ParsedConfig {
         // SIP008-style { "servers": [ {...} ] } — use the first server.
-        (root["servers"] as? List<*>)?.let { servers ->
+        if (root.containsKey("servers")) {
+            checkFields(root, setOf("servers", "version", "bytes_used", "bytes_remaining"))
+            val servers = root["servers"] as? List<*>
+                ?: throw ConfigException("Dynamic config 'servers' must be a list")
             val first = servers.firstOrNull() as? Map<*, *>
                 ?: throw ConfigException("Dynamic config 'servers' list is empty")
-            return normalizeMap(first, nameHint)
+            return parseLeaf(first, nameHint)
         }
 
         // Newer Outline transport graph: { transport: { $type: tcpudp, tcp: {...}, udp: {...} } }
         val transport = root["transport"]
-        val node: Map<*, *> = when (transport) {
-            is Map<*, *> -> resolveTransportGraph(transport)
-            is String -> throw ConfigException("Inline transport strings are not supported")
-            else -> root
+        if (root.containsKey("transport")) {
+            checkFields(root, setOf("transport", "name", "description"))
+            if (transport !is Map<*, *>) throw ConfigException("Transport must be an object")
+            return resolveTransportGraph(transport, nameHint)
         }
+        return parseLeaf(root, nameHint)
+    }
 
+    private fun parseLeaf(node: Map<*, *>, nameHint: String): ParsedConfig {
+        checkFields(node, setOf(
+            "\$type", "type", "method", "cipher", "password", "secret", "server", "host",
+            "server_port", "port", "endpoint", "prefix", "id", "remarks", "name"
+        ))
         // If the node itself declares a transport type, it must be shadowsocks.
-        val type = (node["\$type"] ?: node["type"])?.toString()
+        val type = firstString(node, "\$type", "type")
         if (type != null && !type.equals("shadowsocks", ignoreCase = true)) {
-            throw ConfigException("Unsupported transport type: '$type' (only shadowsocks is supported)")
+            throw ConfigException("Unsupported transport type (only shadowsocks is supported)")
         }
 
         val method = firstString(node, "method", "cipher")
@@ -180,6 +208,7 @@ object ConfigParser {
         var port = firstInt(node, "server_port", "port")
         val endpoint = firstString(node, "endpoint")
         if (endpoint != null) {
+            if (host != null || port != null) throw ConfigException("Use endpoint OR server and port, not both")
             val (h, p) = splitHostPort(endpoint)
             host = h; port = p
         }
@@ -189,22 +218,45 @@ object ConfigParser {
 
         val cipher = resolveCipher(method)
         val prefix = firstString(node, "prefix")?.let { prefixStringToBytes(it) }
+        PrefixPolicy.validate(cipher, prefix)
         val name = displayName(nameHint, host, port)
         return ParsedConfig(name, TransportConfig(host, port, cipher, password, prefix))
     }
 
-    /** Resolve a `transport:` graph node down to the shadowsocks leaf (TCP branch preferred). */
-    private fun resolveTransportGraph(transport: Map<*, *>): Map<*, *> {
-        val type = (transport["\$type"] ?: transport["type"])?.toString()
+    /** Only flatten a graph when both branches are representable by our single endpoint model. */
+    private fun resolveTransportGraph(transport: Map<*, *>, nameHint: String): ParsedConfig {
+        val type = firstString(transport, "\$type", "type")
         when {
-            type.equals("tcpudp", ignoreCase = true) || transport.containsKey("tcp") -> {
+            type.equals("tcpudp", ignoreCase = true) -> {
+                checkFields(transport, setOf("\$type", "type", "tcp", "udp"))
                 val tcp = transport["tcp"] as? Map<*, *>
                     ?: throw ConfigException("Transport 'tcpudp' missing a 'tcp' branch")
-                return resolveTransportGraph(tcp)
+                val udp = transport["udp"] as? Map<*, *>
+                    ?: throw ConfigException("Transport 'tcpudp' missing a 'udp' branch")
+                val parsedTcp = parseLeaf(tcp, nameHint)
+                val parsedUdp = parseLeaf(udp, nameHint)
+                if ((parsedUdp.transport.prefix?.size ?: 0) != 0) {
+                    throw ConfigException("UDP prefixes are not supported by Outshake")
+                }
+                if (parsedTcp.transport.copy(prefix = null) != parsedUdp.transport.copy(prefix = null)) {
+                    throw ConfigException("Distinct TCP/UDP endpoints, ciphers or secrets are not supported")
+                }
+                return parsedTcp
             }
-            type.equals("shadowsocks", ignoreCase = true) -> return transport
-            type == null -> return transport // bare shadowsocks-like map
-            else -> throw ConfigException("Unsupported transport type: '$type' (only shadowsocks is supported)")
+            type == null || type.equals("shadowsocks", ignoreCase = true) -> {
+                val parsed = parseLeaf(transport, nameHint)
+                if ((parsed.transport.prefix?.size ?: 0) != 0) {
+                    throw ConfigException("Use tcpudp with a TCP-only prefix; shared UDP prefixes are unsupported")
+                }
+                return parsed
+            }
+            else -> throw ConfigException("Unsupported transport type (only shadowsocks is supported)")
+        }
+    }
+
+    private fun checkFields(map: Map<*, *>, allowed: Set<String>) {
+        if (map.keys.any { it !is String || it !in allowed }) {
+            throw ConfigException("Unsupported config field; only the documented Shadowsocks subset is accepted")
         }
     }
 
@@ -212,22 +264,37 @@ object ConfigParser {
     // Prefix handling
     // ---------------------------------------------------------------------
 
-    /** Extract & decode the `prefix` query param (percent-encoded raw bytes) from a static key. */
+    /** Decode Outline's URL-escaped Latin-1 prefix string, with a legacy raw-byte fallback. */
     fun extractPrefixFromQuery(query: String): ByteArray? {
         if (query.isBlank()) return null
+        var prefix: ByteArray? = null
+        val seen = HashSet<String>()
         for (pair in query.split('&')) {
             val eq = pair.indexOf('=')
-            if (eq < 0) continue
-            val k = pair.substring(0, eq)
-            if (k.equals("prefix", ignoreCase = true)) {
-                return percentDecodeToBytes(pair.substring(eq + 1))
+            val k = urlDecode(if (eq < 0) pair else pair.substring(0, eq)).lowercase()
+            if (!seen.add(k)) throw ConfigException("Duplicate access key query parameter")
+            when (k) {
+                "prefix" -> {
+                    if (eq < 0) throw ConfigException("Prefix query parameter needs a value")
+                    val bytes = percentDecodeToBytes(pair.substring(eq + 1))
+                    // Outline URL prefixes encode a Latin-1 string through encodeURIComponent.
+                    // Retain legacy raw-byte keys only when the byte sequence is not valid UTF-8.
+                    val decoded = try {
+                        Charsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+                            .onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(bytes)).toString()
+                    } catch (_: java.nio.charset.CharacterCodingException) { null }
+                    prefix = if (decoded == null) bytes else prefixStringToBytes(decoded)
+                }
+                "outline" -> { /* Outline access-key marker; no transport behavior. */ }
+                else -> throw ConfigException("Unsupported access key query parameter (plugins are not supported)")
             }
         }
-        return null
+        return prefix
     }
 
     /** JSON/YAML prefix string: each character is one byte (ISO-8859-1 / Latin-1). */
     fun prefixStringToBytes(s: String): ByteArray {
+        if (s.any { it.code > 255 }) throw ConfigException("Prefix characters must fit in one Latin-1 byte")
         val out = ByteArray(s.length)
         for (i in s.indices) out[i] = (s[i].code and 0xFF).toByte()
         return out
@@ -240,13 +307,18 @@ object ConfigParser {
         while (i < s.length) {
             val c = s[i]
             when {
-                c == '%' && i + 2 < s.length -> {
+                c == '%' -> {
+                    if (i + 2 >= s.length) throw ConfigException("Malformed percent-encoded prefix")
                     val hex = s.substring(i + 1, i + 3)
-                    out.add(hex.toInt(16).toByte())
+                    val byte = hex.toIntOrNull(16) ?: throw ConfigException("Malformed percent-encoded prefix")
+                    out.add(byte.toByte())
                     i += 3
                 }
                 c == '+' -> { out.add(' '.code.toByte()); i++ }
-                else -> { out.add((c.code and 0xFF).toByte()); i++ }
+                else -> {
+                    if (c.code > 255) throw ConfigException("Prefix characters must fit in one Latin-1 byte")
+                    out.add(c.code.toByte()); i++
+                }
             }
         }
         return out.toByteArray()
@@ -258,7 +330,7 @@ object ConfigParser {
 
     private fun resolveCipher(method: String): Cipher =
         Cipher.fromId(method.trim())
-            ?: throw ConfigException("Unsupported cipher: '$method' (supported: chacha20-ietf-poly1305, aes-256-gcm, aes-128-gcm)")
+            ?: throw ConfigException("Unsupported cipher (supported: chacha20-ietf-poly1305, aes-256-gcm, aes-128-gcm)")
 
     private fun splitHostPort(hostPort: String): Pair<String, Int> {
         val hp = hostPort.trim()
@@ -288,22 +360,29 @@ object ConfigParser {
         if (name.isNotBlank()) name else "$host:$port"
 
     private fun firstString(map: Map<*, *>, vararg keys: String): String? {
-        for (k in keys) {
-            val v = map[k]
-            if (v != null && v.toString().isNotBlank()) return v.toString()
+        val present = keys.filter { map.containsKey(it) }
+        if (present.size > 1) throw ConfigException("Ambiguous config field aliases")
+        val key = present.singleOrNull() ?: return null
+        val value = map[key] as? String ?: throw ConfigException("Config field '$key' must be a string")
+        if (value.isBlank() && key != "prefix") {
+            throw ConfigException("Config field '$key' must not be empty")
         }
-        return null
+        return value
     }
 
     private fun firstInt(map: Map<*, *>, vararg keys: String): Int? {
-        for (k in keys) {
-            when (val v = map[k]) {
-                is Number -> return v.toInt()
-                is String -> v.trim().toIntOrNull()?.let { return it }
-                else -> {}
-            }
+        val present = keys.filter { map.containsKey(it) }
+        if (present.size > 1) throw ConfigException("Ambiguous port aliases")
+        val key = present.singleOrNull() ?: return null
+        val value = map[key]
+        val parsed = when (value) {
+            is Int -> value
+            is Long -> value.takeIf { it in 1..65535 }?.toInt()
+            is String -> value.toIntOrNull()
+            else -> null
         }
-        return null
+        return parsed?.takeIf { it in 1..65535 }
+            ?: throw ConfigException("Port must be an integer from 1 to 65535")
     }
 
     private fun urlDecode(s: String): String =
@@ -320,10 +399,7 @@ object ConfigParser {
             3 -> "$cleaned="
             else -> cleaned
         }
-        return try {
-            Base64.getUrlDecoder().decode(padded)
-        } catch (e: Exception) {
-            Base64.getDecoder().decode(padded)
-        }
+        // Bouncy Castle is already bundled for AEAD and also works on API 24/25.
+        return Base64.decode(padded.replace('-', '+').replace('_', '/'))
     }
 }

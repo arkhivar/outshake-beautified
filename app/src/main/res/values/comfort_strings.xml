@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_section_comfort">Sound &amp; comfort</string>
+    <string name="comfort_sound_toggle">Pigeon sounds</string>
+    <string name="comfort_sound_description">Gentle coos and soft seed ticks. Muted in silent or vibrate mode, and when notification volume is off.</string>
+    <string name="comfort_motion_toggle">Reduced motion</string>
+    <string name="comfort_motion_description">Keep the pigeon and seeds still, with simple state changes. System animation settings are also respected.</string>
+</resources>

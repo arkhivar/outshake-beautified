@@ -37,6 +37,65 @@ without re-deriving context. Read this file first before proposing changes.
 
 ---
 
+## 2026-09-14 — Character-led courtyard redesign
+
+**Base:** beautified `6df4171`. UI/mascot/audio scope only; source and local build
+verified. Remote publication and GitHub CI must be confirmed separately.
+
+### Changes
+
+- Replaced the power-ring/two-frame-sprite home screen with a scrollable
+  character-led courtyard, original articulated native Canvas pigeon,
+  six explicit service-state presentations, warm day/night resources, and
+  descriptive connect/disconnect/import actions.
+- Added independent head/neck, eyes/lids, wings, feet and tail choreography:
+  hungry strut, peck/chew/dance, transition anticipation, error droop, and a
+  bounded success hop/scatter. No copied game assets or external asset loading.
+- Added original reproducible synthesized coos/seed ticks, shared async sample
+  playback with expiry/mute/lifecycle gating, sound preference and reduced motion.
+  Existing haptic patterns and shake detector/cooldown remain unchanged.
+- Rebuilt onboarding with the same original character, a VPN-free demo,
+  scrollable content, restored step state and notification-denial history.
+  Updated the launcher icon; removed superseded raster mascot and MP3 assets.
+- Changed “You're protected” to “VPN connected.” No tunnel-health or security
+  guarantee is implied. Profile edits are blocked during active/transitional
+  connections. MainActivity state collection is lifecycle-bound; offscreen,
+  unfocused and paused scenes stop animating and stop pending/active screen audio.
+- Fixed pre-existing theme API27 navigation-bar attributes by moving them to
+  version-qualified resources. VersionCode is now 2 / `1.1.0-courtyard`.
+- Added lint and native preview/test-report artifact uploads to Android CI.
+
+### Verification performed
+
+- JDK 17.0.20.1, Gradle 8.7, Android platform/build tools 34.
+- `testDebugUnitTest`: **131 methods, 125 passed, 6 explicitly skipped, 0
+  failures/errors**. The six skipped tests require opt-in local `ss-server`.
+- `assembleDebug`: success, approximately 9.3 MiB, local debug signing only.
+- `lintDebug`: **0 errors, 53 warnings**. Remaining warnings include inherited
+  wake-lock/battery-policy and dependency/unused-resource/style warnings; no
+  blanket lint baseline or error suppression was added.
+- Eight pure rig tests, eighteen audio-policy/queue tests, four state-map tests,
+  five Robolectric activity tests, and three native graphics/layout tests.
+  Real MainActivity/OnboardingActivity create/recreate and state/import/demo
+  behavior were exercised at API28, without a physical VPN/sensor connection.
+- Native Skia renders reviewed for all six day/night states, actual AppCompat
+  home/onboarding/settings, small-screen large-text scrolling, and sampled
+  animation poses. Deterministic GIF exported from the native rig.
+- Audio reproducibility, duration, zero-ended envelopes and no-clipping checks
+  pass. No claim of physical-device listening or haptic QA.
+- `git diff` confirms **no changes to `vpn/`, `transport/`, `config/`, manifest,
+  backup rules or Haptics.kt** from the beautified base.
+
+### Remaining release checks
+
+Honor/MagicOS device smoothness, battery usage, quiet modes, physical shake,
+actual VPN consent/traffic and all existing D1–D14 transport risks remain
+unverified/unchanged. A sandbox debug APK is not proven compatible with the
+installed signing certificate. Do not uninstall or clear profiles to bypass a
+signature mismatch. See `COURTYARD.md` for the device checklist.
+
+---
+
 ## 2026-09-13 — Source audit, config hardening, documentation overhaul
 
 **Commit:** `6cdd504` (pushed to `main`, fast-forward from `5db54ed`).

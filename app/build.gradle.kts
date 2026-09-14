@@ -11,8 +11,8 @@ android {
         applicationId = "com.outshake"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0-courtyard"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -35,6 +35,7 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
@@ -52,9 +53,11 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("org.robolectric:robolectric:4.14.1")
 }
 
 // Live loopback transport tests are opt-in; ordinary unit tests require no local SS server.
 tasks.withType<Test>().configureEach {
     systemProperty("outshake.liveTests", providers.gradleProperty("liveTransportTests").orElse("false").get())
+    systemProperty("outshake.renderFrames", providers.gradleProperty("renderMascotFrames").orElse("false").get())
 }

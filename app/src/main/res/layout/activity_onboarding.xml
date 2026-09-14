@@ -1,226 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- The whole journey scrolls, including its actions: no weighted, clipped step interiors. -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/onboardingScroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background"
-    android:padding="24dp">
+    android:fillViewport="true"
+    android:clipToPadding="false">
 
-    <!-- Step progress dots (populated programmatically) -->
     <LinearLayout
-        android:id="@+id/stepDots"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingTop="8dp"
-        android:paddingBottom="16dp"
-        android:importantForAccessibility="no" />
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="32dp">
 
-    <FrameLayout
-        android:id="@+id/stepContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <!-- Step 1: Welcome -->
-        <LinearLayout
-            android:id="@+id/stepWelcome"
+        <TextView
+            android:id="@+id/stepCounter"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="16dp">
+            android:accessibilityLiveRegion="polite"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="@color/on_surface_secondary" />
 
-            <ImageView
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:src="@drawable/pigeon_hungry_up"
-                android:importantForAccessibility="no" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="28dp"
-                android:text="@string/onboarding_welcome_title"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                android:textColor="@color/on_surface"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="12dp"
-                android:text="@string/onboarding_welcome_body"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="@color/on_surface_secondary" />
-        </LinearLayout>
-
-        <!-- Step 2: Notifications (API 33+ only) -->
         <LinearLayout
-            android:id="@+id/stepNotifications"
+            android:id="@+id/stepDots"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:gravity="center"
-            android:padding="16dp"
-            android:visibility="gone">
+            android:paddingTop="10dp"
+            android:paddingBottom="20dp"
+            android:importantForAccessibility="noHideDescendants" />
 
-            <ImageView
-                android:layout_width="104dp"
-                android:layout_height="104dp"
-                android:src="@drawable/ic_bell"
-                app:tint="@color/accent"
-                android:importantForAccessibility="no" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="28dp"
-                android:text="@string/onboarding_notifications_title"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                android:textColor="@color/on_surface"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="12dp"
-                android:text="@string/onboarding_notifications_body"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="@color/on_surface_secondary" />
-        </LinearLayout>
-
-        <!-- Step 3: Battery / background -->
-        <LinearLayout
-            android:id="@+id/stepBattery"
+        <!-- Exactly one live mascot is reused across every step. -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/courtyard"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <com.outshake.ui.mascot.PigeonView
+                android:id="@+id/pigeonScene"
+                android:layout_width="match_parent"
+                android:layout_height="228dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/onboarding_demo_accessibility" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:gravity="center"
-            android:padding="16dp"
-            android:visibility="gone">
+            android:text="@string/onboarding_demo_hint"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/on_surface_secondary" />
 
-            <ImageView
-                android:layout_width="104dp"
-                android:layout_height="104dp"
-                android:src="@drawable/ic_battery"
-                app:tint="@color/accent"
-                android:importantForAccessibility="no" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="28dp"
-                android:text="@string/onboarding_battery_title"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                android:textColor="@color/on_surface"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="12dp"
-                android:text="@string/onboarding_battery_body"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="@color/on_surface_secondary" />
+        <FrameLayout
+            android:id="@+id/stepContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp">
 
             <LinearLayout
-                android:id="@+id/batteryStatusRow"
-                android:layout_width="wrap_content"
+                android:id="@+id/stepWelcome"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="16dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/ic_check_circle"
-                    app:tint="@color/success"
-                    android:importantForAccessibility="no" />
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="8dp"
-                    android:text="@string/onboarding_battery_granted"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="@color/success"
+                    android:accessibilityHeading="true"
+                    android:text="@string/onboarding_welcome_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                    android:textColor="@color/on_surface"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="@string/onboarding_welcome_body"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface_secondary" />
             </LinearLayout>
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/stepNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="20dp"
-                android:text="@string/onboarding_battery_note"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="@color/on_surface_secondary" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:visibility="gone">
 
-        <!-- Step 4: Shake intro -->
-        <LinearLayout
-            android:id="@+id/stepShake"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:text="@string/onboarding_notifications_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                    android:textColor="@color/on_surface"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="@string/onboarding_notifications_body"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/stepBattery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:text="@string/onboarding_battery_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineMedium"
+                    android:textColor="@color/on_surface"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="@string/onboarding_battery_body"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface_secondary" />
+
+                <TextView
+                    android:id="@+id/batteryStatusRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:accessibilityLiveRegion="polite"
+                    android:text="@string/onboarding_battery_granted"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:lineSpacingExtra="2dp"
+                    android:text="@string/onboarding_battery_note"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="@color/on_surface_secondary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/stepShake"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:accessibilityHeading="true"
+                    android:text="@string/onboarding_shake_title"
+                    android:textAppearance="?attr/textAppearanceHeadlineLarge"
+                    android:textColor="@color/on_surface"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="@string/onboarding_shake_body"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:textColor="@color/on_surface_secondary" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/primaryButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="16dp"
-            android:visibility="gone">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:minHeight="56dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:singleLine="false"
+            android:text="@string/onboarding_get_started"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="@color/on_seed_button"
+            app:backgroundTint="@color/seed_button"
+            app:cornerRadius="28dp" />
 
-            <ImageView
-                android:layout_width="104dp"
-                android:layout_height="104dp"
-                android:src="@drawable/pigeon_peck_down"
-                android:importantForAccessibility="no" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="28dp"
-                android:text="@string/onboarding_shake_title"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                android:textColor="@color/on_surface"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_marginTop="12dp"
-                android:text="@string/onboarding_shake_body"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="@color/on_surface_secondary" />
-        </LinearLayout>
-    </FrameLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/primaryButton"
-        style="@style/Widget.Material3.Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="52dp"
-        android:text="@string/onboarding_get_started"
-        app:cornerRadius="26dp" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/secondaryButton"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginTop="4dp"
-        android:text="@string/onboarding_skip"
-        android:visibility="gone" />
-</LinearLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/secondaryButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="4dp"
+            android:singleLine="false"
+            android:text="@string/onboarding_skip"
+            android:textColor="@color/on_surface_secondary"
+            android:visibility="gone" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

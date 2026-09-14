@@ -1,5 +1,40 @@
 # Outshake
 
+## The courtyard edition
+
+Less button. More pigeon. **Coo is now the interface**, not a two-frame sticker
+beside a power switch. Tap Coo or the descriptive action below the courtyard to
+request a VPN connection; tap again to let Coo rest and disconnect. The original
+shake gesture and Quick Settings tile still use the same connection manager.
+
+- An original native Canvas character with an articulated neck, independent
+  gaze/blinks, curved iridescent plumage, wing feathers and stepping feet.
+- Hungry head-bobbing and begging while idle; anticipation while connecting;
+  pecking, chewing and a tiny two-step only after the service reports connected.
+  Reconnecting, disconnecting and error each have their own behavior.
+- Springy success hops, soft seed particles and original short synthesized coos
+  with seed ticks. No copied game art, audio, sprite sheets, WebView or network
+  asset downloads.
+- Sound and reduced-motion preferences in Settings. Sound follows silent/vibrate
+  mode and notification volume. Animation respects system animation disabling
+  and stops when the screen is paused, detached or hidden.
+- Scrollable day/night UI and onboarding; labeled touch actions rather than an
+  unexplained power icon. Profile selection remains separate from tunnel state.
+
+The mascot is inspired by the joy of expressive character animation, not a copy
+of Pigeon Pop. See [COURTYARD.md](COURTYARD.md) for interaction rules, rendering
+tests, audio provenance and the device-verification checklist.
+
+### Native previews
+
+Idle on the left, connected on the right. This is a deterministic render of the
+actual Android Canvas rig, not a recording from a physical device.
+
+![Coo's idle strut and connected pecking animation](docs/previews/coo-motion.gif)
+
+<img src="docs/previews/home.png" alt="The courtyard home screen, rendered from MainActivity with a synthetic profile" width="320" />
+<img src="docs/previews/onboarding.png" alt="Coo's onboarding demo, rendered from OnboardingActivity" width="320" />
+
 A small, Android-native Kotlin Shadowsocks VPN client for personal use. It accepts
 a **subset** of Outline access keys and configurations; it is not the official
 Outline client and does not embed Outline's tunnel engine.
@@ -14,8 +49,8 @@ verification history). Read it before proposing changes.
   `aes-256-gcm`, or `aes-128-gcm`.
 - Relays IPv4 app traffic through a small userspace TCP/UDP engine. UDP has an
   idle-expiring endpoint table; DNS has a UDP-to-TCP fallback attempt.
-- Offers a Material3 DayNight theme (dark mode supported), profile cards, a
-  large circular connect button, a first-run onboarding flow (welcome →
+- Offers a Material3 DayNight courtyard (dark mode supported), profile cards, a
+  character-led connection action, a first-run onboarding flow (welcome →
   notifications → battery-optimization exemption → shake intro) and a Quick
   Settings tile. Shake-to-toggle is **on by default**, with a five-second
   cooldown and optional haptics. Existing preferences are preserved.
@@ -48,8 +83,10 @@ Do **not** uninstall or clear storage to work around `INSTALL_FAILED_UPDATE_INCO
 that deletes profiles/settings. Obtain a build signed with your original key
 instead. Same-signature updates preserve local preferences; the review makes no
 profile-schema migration. Keep the old APK for rollback, but remember that
-Android also checks version codes. Both this review and the original 1.0 build
-use versionCode 1; future releases may require a different rollback procedure.
+Android also checks version codes. The courtyard edition uses versionCode 2
+(1.1.0-courtyard); the original 1.0 build uses versionCode 1. Rollback to an older
+version can require a supported downgrade procedure, and must not be attempted
+by clearing app data.
 
 This review tightens config validation. Existing safe profiles remain stored;
 unsafe saved prefixes are refused when creating a transport. Re-import a static
@@ -81,8 +118,12 @@ sdkmanager --licenses
 ```
 
 The ordinary JVM suite includes parser, crypto, fetch-policy, feedback and pure
-reconnect/NAT decision tests. Android API calls are stubbed; these tests do **not**
-validate sensors, notifications, consent, socket protection, routing or lifecycle.
+reconnect/NAT decision tests. Most Android API calls are stubbed. Dedicated
+Robolectric native-graphics tests inflate and render the actual courtyard layout
+in all six service states in day/night themes, plus check small-screen large-font
+scrolling. Rendered PNGs are written to `app/build/courtyard-previews/`.
+These tests do **not** validate real sensors, notifications, VPN consent, socket
+protection, routing or the tunnel lifecycle.
 Six local-server test methods are skipped unless explicitly enabled:
 
 ```sh

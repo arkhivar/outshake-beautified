@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_step_progress">Step %1$d of %2$d</string>
+    <string name="onboarding_demo_hint">Tap Coo for a little celebration.\nJust a demo — no VPN connection.</string>
+    <string name="onboarding_demo_accessibility">Coo the pigeon. Tap to preview a celebration. This demo does not connect the VPN.</string>
+    <string name="onboarding_demo_feedback">Coo celebrates! Demo only. No VPN connection was requested.</string>
+</resources>

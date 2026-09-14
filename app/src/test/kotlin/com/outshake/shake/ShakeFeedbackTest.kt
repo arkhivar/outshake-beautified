@@ -42,4 +42,12 @@ class ShakeFeedbackTest {
     fun `busy transition produces no cue`() {
         assertEquals(ShakeService.Feedback.NONE, ShakeService.feedbackFor("Busy — ignoring shake"))
     }
+
+    @Test
+    fun `errors and unrecognized results never imply a successful action`() {
+        listOf("Connected", "Disconnected", "Error", "VPN request failed", "").forEach {
+            assertEquals(ShakeService.Feedback.NONE, ShakeService.feedbackFor(it))
+            assertNull(ShakeService.feedbackMessage(it))
+        }
+    }
 }

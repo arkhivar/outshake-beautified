@@ -1,17 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Single-color Coo silhouette for Android themed icons, with transparent expressive eyes. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Shield + shake waveform, kept inside the 66dp adaptive-icon safe zone -->
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M54,28 L76,37 V58 C76,72 66.5,81 54,88 C41.5,81 32,72 32,58 V37 Z" />
+        android:fillColor="#263330"
+        android:fillType="evenOdd"
+        android:pathData="M29,76 C32,67 41,67 43,62 L41,54 C34,50 32,39 36,32 C39,27 44,25 49,25 L46,21 C54,20 59,23 62,27 C74,27 78,35 76,43 L73,47 L82,51 L76,57 L67,57 C65,64 67,68 72,70 C77,72 81,76 80,79 C67,88 42,87 29,76 Z M39,41 C38,35 42,32 47,33 C52,33 55,38 53,44 C52,48 48,50 44,48 C41,47 39,44 39,41 Z M56,39 C57,32 64,30 70,34 C75,38 74,46 69,49 C64,53 57,48 56,43 Z M42,61 C49,68 58,67 65,62 L65,65 C57,71 49,71 42,65 Z" />
     <path
-        android:strokeColor="#01696F"
-        android:strokeWidth="4.5"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:fillColor="#00000000"
-        android:pathData="M38,56h7l4.5,-9 7,18 4.5,-9h9" />
+        android:fillColor="#263330"
+        android:pathData="M46,37 C50,36 52,40 51,43 C50,47 46,47 44,44 C42,41 43,38 46,37 Z M66,36 C70,36 72,40 71,44 C70,48 65,48 63,44 C61,40 63,37 66,36 Z" />
 </vector>

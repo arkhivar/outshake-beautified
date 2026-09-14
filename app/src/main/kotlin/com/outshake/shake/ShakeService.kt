@@ -7,8 +7,6 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.SoundPool
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
@@ -38,9 +36,7 @@ class ShakeService : Service() {
     private var detector: ShakeDetector? = null
     private var sensorThread: HandlerThread? = null
     private var wakeLock: PowerManager.WakeLock? = null
-    private var soundPool: SoundPool? = null
-    private var onSoundId = 0
-    private var offSoundId = 0
+    private var cooSounds: CooSoundPlayer? = null
     private val main = Handler(Looper.getMainLooper())
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -70,23 +66,15 @@ class ShakeService : Service() {
 
         // First start (or full recovery after process death): heavy init happens only here.
         startForeground(NOTIFICATION_ID, buildNotification())
-        ensureSoundPool()
+        ensureSoundPlayer()
         registerDetector()
         // START_STICKY: if the OS kills us under memory pressure, restart (while still enabled).
         return START_STICKY
     }
 
     /** Loaded lazily on the enabled path so a pref-off start never pays for audio setup. */
-    private fun ensureSoundPool() {
-        if (soundPool != null) return
-        val attrs = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION_EVENT) // notification stream → muted in silent/vibrate
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
-        val pool = SoundPool.Builder().setMaxStreams(1).setAudioAttributes(attrs).build()
-        onSoundId = pool.load(this, R.raw.coo_on, 1)
-        offSoundId = pool.load(this, R.raw.coo_off, 1)
-        soundPool = pool
+    private fun ensureSoundPlayer() {
+        if (cooSounds == null) cooSounds = CooSoundPlayer(this)
     }
 
     private fun registerDetector() {
@@ -130,15 +118,15 @@ class ShakeService : Service() {
             return
         }
         when (feedbackFor(result)) {
-            Feedback.VPN_ON -> feedback(onSoundId, feedbackMessage(result)!!)
-            Feedback.VPN_OFF -> feedback(offSoundId, feedbackMessage(result)!!)
+            Feedback.VPN_ON -> feedback(CooSoundPlayer.Cue.FEED, feedbackMessage(result)!!)
+            Feedback.VPN_OFF -> feedback(CooSoundPlayer.Cue.REST, feedbackMessage(result)!!)
             Feedback.MESSAGE -> toast(feedbackMessage(result)!!)
             Feedback.NONE -> { /* busy mid-transition: shake not accepted, no feedback */ }
         }
     }
 
-    private fun feedback(soundId: Int, message: String) {
-        soundPool?.play(soundId, VOLUME, VOLUME, 1, 0, 1f)
+    private fun feedback(cue: CooSoundPlayer.Cue, message: String) {
+        cooSounds?.play(cue)
         toast(message)
     }
 
@@ -158,8 +146,8 @@ class ShakeService : Service() {
         sensorThread?.quitSafely()
         sensorThread = null
         releaseWakeLock()
-        soundPool?.release()
-        soundPool = null
+        cooSounds?.release()
+        cooSounds = null
         super.onDestroy()
     }
 
@@ -213,7 +201,6 @@ class ShakeService : Service() {
 
         private const val CHANNEL_ID = "outshake_shake"
         private const val NOTIFICATION_ID = 2
-        private const val VOLUME = 0.35f
         private const val WAKE_LOCK_TAG = "outshake:shake"
 
         /**

@@ -1,7 +1,6 @@
 <resources>
-    <!-- Night variant: same mapping as the base theme (colors come from values-night),
-         but system bars switch to light-on-dark icons. -->
     <style name="Theme.Outshake" parent="Theme.Outshake.Base">
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>

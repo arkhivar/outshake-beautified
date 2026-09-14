@@ -1,15 +1,18 @@
 <resources>
     <!-- Warm-neutral palette (light). Dark counterparts live in values-night/colors.xml. -->
-    <color name="background">#F7F6F2</color>
-    <color name="surface">#F7F6F2</color>
-    <color name="surface_raised">#FFFFFF</color>
-    <color name="on_surface">#28251D</color>
-    <color name="on_surface_secondary">#7A7974</color>
-    <color name="accent">#01696F</color>
+    <color name="background">#F6F5EF</color>
+    <color name="surface">#F6F5EF</color>
+    <color name="surface_raised">#EAEAE3</color>
+    <color name="on_surface">#263330</color>
+    <color name="on_surface_secondary">#59645E</color>
+    <color name="accent">#3D6252</color>
+    <color name="courtyard">#E8EDE1</color>
+    <color name="seed_button">#D3C5EF</color>
+    <color name="on_seed_button">#352B49</color>
     <color name="accent_pressed">#0C4E54</color>
     <color name="on_accent">#FFFFFF</color>
-    <color name="accent_container">#CDE7E9</color>
-    <color name="on_accent_container">#01353A</color>
+    <color name="accent_container">#DAE7D8</color>
+    <color name="on_accent_container">#294836</color>
     <color name="error">#A12C7B</color>
     <color name="on_error">#FFFFFF</color>
     <color name="success">#437A22</color>

@@ -46,6 +46,16 @@ class SettingsActivity : AppCompatActivity() {
             store.vibrateOnToggle = checked
         }
 
+        binding.soundSwitch.isChecked = store.soundEnabled
+        binding.soundSwitch.setOnCheckedChangeListener { _, checked ->
+            store.soundEnabled = checked
+        }
+
+        binding.reducedMotionSwitch.isChecked = store.reducedMotion
+        binding.reducedMotionSwitch.setOnCheckedChangeListener { _, checked ->
+            store.reducedMotion = checked
+        }
+
         binding.bootSwitch.isChecked = store.connectOnBoot
         binding.bootSwitch.setOnCheckedChangeListener { _, checked ->
             store.connectOnBoot = checked

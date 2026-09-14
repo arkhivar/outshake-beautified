@@ -71,6 +71,16 @@ class ProfileStore(context: Context) {
         get() = prefs.getBoolean(KEY_VIBRATE, true)
         set(value) = prefs.edit().putBoolean(KEY_VIBRATE, value).apply()
 
+    /** Short pigeon/seed feedback. System silent/vibrate and notification mute still take priority. */
+    var soundEnabled: Boolean
+        get() = prefs.getBoolean(KEY_SOUND_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_SOUND_ENABLED, value).apply()
+
+    /** Reduce decorative mascot motion; the screen also honors the system animation preference. */
+    var reducedMotion: Boolean
+        get() = prefs.getBoolean(KEY_REDUCED_MOTION, false)
+        set(value) = prefs.edit().putBoolean(KEY_REDUCED_MOTION, value).apply()
+
     /**
      * The user's intent: true while the VPN should be up. Persisted so a process-death restart
      * (START_STICKY) can re-establish the tunnel and the UI can reflect the true desired state.
@@ -121,5 +131,7 @@ class ProfileStore(context: Context) {
         private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
         private const val KEY_SHOULD_CONNECT = "should_be_connected"
         private const val KEY_VIBRATE = "vibrate_on_toggle"
+        private const val KEY_SOUND_ENABLED = "sound_enabled"
+        private const val KEY_REDUCED_MOTION = "reduced_motion"
     }
 }

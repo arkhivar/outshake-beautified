@@ -36,6 +36,20 @@ jobs:
       - name: Assemble debug APK
         run: ./gradlew :app:assembleDebug
 
+      - name: Android lint
+        run: ./gradlew :app:lintDebug
+
+      - name: Upload native courtyard previews and test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: courtyard-verification
+          path: |
+            app/build/courtyard-previews/
+            app/build/reports/tests/
+            app/build/reports/lint-results-debug.html
+          if-no-files-found: warn
+
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:

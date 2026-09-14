@@ -1,15 +1,18 @@
 <resources>
     <!-- Warm-neutral palette (dark). Accent is lightened for contrast on dark surfaces. -->
-    <color name="background">#1C1B17</color>
-    <color name="surface">#1C1B17</color>
-    <color name="surface_raised">#292721</color>
-    <color name="on_surface">#E9E5DA</color>
-    <color name="on_surface_secondary">#A9A59A</color>
-    <color name="accent">#4FADB3</color>
+    <color name="background">#171E23</color>
+    <color name="surface">#171E23</color>
+    <color name="surface_raised">#293438</color>
+    <color name="on_surface">#F0F1E8</color>
+    <color name="on_surface_secondary">#B0BEB6</color>
+    <color name="accent">#ADD6BB</color>
+    <color name="courtyard">#25312F</color>
+    <color name="seed_button">#CCB8EC</color>
+    <color name="on_seed_button">#2F2543</color>
     <color name="accent_pressed">#7AC9CE</color>
-    <color name="on_accent">#00363B</color>
-    <color name="accent_container">#01474C</color>
-    <color name="on_accent_container">#BCE9EC</color>
+    <color name="on_accent">#193D2B</color>
+    <color name="accent_container">#304D3D</color>
+    <color name="on_accent_container">#D1EAD7</color>
     <color name="error">#E2A0CE</color>
     <color name="on_error">#4A0E33</color>
     <color name="success">#9CD47E</color>

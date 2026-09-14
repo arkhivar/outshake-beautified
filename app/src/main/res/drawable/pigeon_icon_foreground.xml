@@ -1,15 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Adaptive-icon foreground for the pigeon head. The 108dp canvas only guarantees the central
-     ~72dp circle; the 512px head art fills edge-to-edge, so inset it ~20dp per side (~63% of the
-     canvas) to keep the head inside the safe zone on circular/squircle masks. -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:left="20dp"
-        android:top="20dp"
-        android:right="20dp"
-        android:bottom="20dp">
-        <bitmap
-            android:src="@drawable/pigeon_head"
-            android:gravity="center" />
-    </item>
-</layer-list>
+<!-- Original Coo portrait. All identifying features stay inside the adaptive-icon safe circle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Lavender-slate shoulders and the tall, iridescent mint neck. -->
+    <path
+        android:fillColor="#85839B"
+        android:pathData="M29,76 C32,67 42,66 47,63 L65,63 C75,65 81,72 80,79 C67,88 42,87 29,76 Z" />
+    <path
+        android:fillColor="#686D85"
+        android:pathData="M30,76 C38,71 42,73 47,81 C38,81 34,79 30,76 Z M67,70 C74,70 78,73 80,79 L70,83 Z" />
+    <path
+        android:fillColor="#76AF9C"
+        android:pathData="M41,47 C46,47 64,48 67,51 C65,60 65,65 71,75 C65,84 48,84 39,74 C45,65 44,57 41,47 Z" />
+    <path
+        android:fillColor="#A7D9BC"
+        android:pathData="M45,50 C48,50 55,53 57,53 C55,64 56,71 62,78 C56,82 46,78 44,74 C48,65 46,57 45,50 Z" />
+    <path
+        android:fillColor="#D3C5EF"
+        android:pathData="M42,59 C49,66 57,65 65,59 L66,64 C59,70 49,70 42,64 Z" />
+    <path
+        android:fillColor="#537A76"
+        android:pathData="M42,66 C49,73 60,71 66,67 L67,71 C58,77 49,76 41,71 Z" />
+    <!-- A slightly lopsided crown, cheek and lifted brow give the bird its own character. -->
+    <path
+        android:fillColor="#9692AB"
+        android:pathData="M36,45 C31,33 39,25 49,25 L46,21 C54,20 59,23 62,27 C74,27 78,35 76,43 C76,53 67,59 55,58 C45,58 38,54 36,45 Z" />
+    <path
+        android:fillColor="#B6A9CC"
+        android:pathData="M38,36 C39,29 48,27 54,30 C63,25 71,31 73,36 C63,33 57,38 54,39 C48,34 42,34 38,36 Z" />
+    <!-- Generous warm-white eyes; mismatched gaze adds curiosity without a stock silhouette. -->
+    <path
+        android:fillColor="#F6F5EF"
+        android:pathData="M39,41 C38,35 42,32 47,33 C52,33 55,38 53,44 C52,48 48,50 44,48 C41,47 39,44 39,41 Z" />
+    <path
+        android:fillColor="#F6F5EF"
+        android:pathData="M56,39 C57,32 64,30 70,34 C75,38 74,46 69,49 C64,53 57,48 56,43 Z" />
+    <path
+        android:fillColor="#263330"
+        android:pathData="M46,37 C50,36 52,40 51,43 C50,47 46,47 44,44 C42,41 43,38 46,37 Z M66,36 C70,36 72,40 71,44 C70,48 65,48 63,44 C61,40 63,37 66,36 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M46,38 A1.6,1.6 0,1 0,46,41.2 A1.6,1.6 0,1 0,46,38 Z M66,37 A1.8,1.8 0,1 0,66,40.6 A1.8,1.8 0,1 0,66,37 Z" />
+    <path
+        android:fillColor="#263330"
+        android:fillAlpha="0.65"
+        android:pathData="M40,31 C43,27 49,28 52,31 C47,30 44,30 40,32 Z M60,28 C65,25 71,29 73,33 C68,30 64,29 60,30 Z" />
+    <!-- Orange beak with a small cream cere, never the old shield/waveform mark. -->
+    <path
+        android:fillColor="#E79A56"
+        android:pathData="M59,47 C66,44 73,47 82,51 C78,55 72,56 63,54 Z" />
+    <path
+        android:fillColor="#C87845"
+        android:pathData="M62,52 L82,51 C77,57 69,59 65,56 Z" />
+    <path
+        android:fillColor="#EAEAE3"
+        android:pathData="M57,47 C58,44 63,44 66,47 L65,50 L59,50 Z" />
+    <path
+        android:fillColor="#263330"
+        android:pathData="M64,52 C70,53 74,52 78,52 C74,54 68,54 64,53 Z" />
+    <path
+        android:fillColor="#D98B86"
+        android:fillAlpha="0.7"
+        android:pathData="M41,51 C44,49 48,50 49,52 C47,55 42,54 41,51 Z" />
+</vector>

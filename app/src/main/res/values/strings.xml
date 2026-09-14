@@ -4,7 +4,7 @@
     <!-- Main screen -->
     <string name="status_disconnected">Not connected</string>
     <string name="status_connecting">Connecting…</string>
-    <string name="status_connected">You\'re protected</string>
+    <string name="status_connected">VPN connected</string>
     <string name="status_reconnecting">Reconnecting…</string>
     <string name="status_disconnecting">Disconnecting…</string>
     <string name="status_error">Something went wrong</string>
@@ -60,8 +60,8 @@
     <string name="sensitivity_value_fmt">%1$s — threshold %2$.1f g</string>
 
     <!-- Onboarding -->
-    <string name="onboarding_welcome_title">Welcome to Outshake</string>
-    <string name="onboarding_welcome_body">A VPN you toggle by shaking your phone. One shake connects you — another disconnects. No digging through settings.</string>
+    <string name="onboarding_welcome_title">Your internet.\nWith extra coo.</string>
+    <string name="onboarding_welcome_body">Meet Coo, your very hungry VPN companion. Feed the pigeon to request a connection. Let it rest to disconnect. Same VPN, a little more soul.</string>
     <string name="onboarding_get_started">Get started</string>
     <string name="onboarding_notifications_title">Keep the shake listener alive</string>
     <string name="onboarding_notifications_body">Outshake listens for shakes in the background so the gesture works from any screen. Android requires a quiet ongoing notification for that — allow notifications so shake-to-toggle keeps working.</string>
@@ -71,8 +71,8 @@
     <string name="onboarding_allow_background">Allow background activity</string>
     <string name="onboarding_battery_granted">Background activity allowed</string>
     <string name="onboarding_battery_note">Note: some manufacturers (Xiaomi, Oppo, Vivo and others) also require enabling "Autostart" for Outshake in system settings.</string>
-    <string name="onboarding_shake_title">Shake to toggle</string>
-    <string name="onboarding_shake_body">Give your phone a quick double-shake to connect or disconnect. If it triggers too easily — or not at all — adjust the sensitivity in Settings.</string>
+    <string name="onboarding_shake_title">Shake. Coo. Repeat.</string>
+    <string name="onboarding_shake_body">A quick double-shake requests a connection or disconnect, with a soft coo and a little tick. Add a server and grant VPN permission first. Tune sound, motion and sensitivity in Settings.</string>
     <string name="onboarding_done">Done</string>
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_skip">Skip for now</string>

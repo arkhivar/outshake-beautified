@@ -1,223 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:fillViewport="true"
     android:background="@color/background"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
-    android:paddingTop="16dp"
-    android:paddingBottom="20dp">
+    android:clipToPadding="false">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:textColor="@color/on_surface"
-        android:letterSpacing="0.02"
-        android:textStyle="bold"
-        android:paddingBottom="8dp" />
-
-    <!-- Hero: the connection toggle is the centerpiece. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:paddingTop="4dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="28dp">
 
-        <!-- Status headline + mascot: the pigeon lives beside the status column. The profile
-             list below is weight=1, so it absorbs any height pressure on small screens. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingBottom="24dp">
-
-            <LinearLayout
+            android:orientation="horizontal">
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
-
-                <TextView
-                    android:id="@+id/statusText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/status_disconnected"
-                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                    android:textColor="@color/on_surface"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/activeText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/no_active_profile"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="@color/on_surface_secondary"
-                    android:paddingTop="4dp" />
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/mascotImage"
-                android:layout_width="128dp"
-                android:layout_height="128dp"
-                android:layout_marginStart="8dp"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:src="@drawable/pigeon_hungry_anim"
-                android:contentDescription="@string/cd_pigeon_mascot" />
+                android:text="@string/brand_wordmark"
+                android:fontFamily="sans-serif-black"
+                android:textSize="29sp"
+                android:letterSpacing="-0.045"
+                android:textColor="@color/on_surface" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/settingsButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:minWidth="48dp"
+                android:text="@string/settings"
+                android:textSize="13sp"
+                android:textColor="@color/on_surface"
+                app:icon="@drawable/ic_tune"
+                app:iconSize="18dp"
+                app:iconTint="@color/on_surface"
+                app:cornerRadius="24dp" />
         </LinearLayout>
 
-        <FrameLayout
-            android:layout_width="176dp"
-            android:layout_height="176dp">
-
-            <View
-                android:id="@+id/connectRing"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/connect_ring" />
-
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/connectProgress"
-                android:layout_width="176dp"
-                android:layout_height="176dp"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:visibility="gone"
-                app:indicatorSize="176dp"
-                app:trackThickness="6dp"
-                app:indicatorColor="@color/accent"
-                app:trackColor="@android:color/transparent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/connectButton"
-                android:layout_width="152dp"
-                android:layout_height="152dp"
-                android:layout_gravity="center"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:padding="0dp"
-                android:contentDescription="@string/cd_connect_vpn"
-                app:backgroundTint="@color/surface_raised"
-                app:icon="@drawable/ic_power"
-                app:iconSize="56dp"
-                app:iconPadding="0dp"
-                app:iconGravity="textStart"
-                app:iconTint="@color/accent"
-                app:shapeAppearance="@style/ShapeAppearance.Outshake.Circle"
-                android:elevation="2dp" />
-        </FrameLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/brand_tagline"
+            android:textSize="12sp"
+            android:letterSpacing="0.16"
+            android:textColor="@color/on_surface_secondary" />
 
         <TextView
-            android:id="@+id/connectHint"
+            android:id="@+id/statusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/tap_to_connect"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="@color/on_surface_secondary"
-            android:paddingTop="12dp" />
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_status"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:text="@string/status_disconnected"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:accessibilityLiveRegion="polite"
+            android:textColor="@color/on_surface" />
+
+        <TextView
+            android:id="@+id/heroTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/hero_idle"
+            android:fontFamily="sans-serif-black"
+            android:textSize="36sp"
+            android:letterSpacing="-0.045"
+            android:lineSpacingExtra="-2dp"
+            android:includeFontPadding="false"
+            android:textColor="@color/on_surface" />
+
+        <TextView
+            android:id="@+id/heroSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/hero_idle_body"
+            android:textSize="14sp"
+            android:lineSpacingExtra="3dp"
+            android:textColor="@color/on_surface_secondary" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/courtyard">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="16dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="@string/coo_name"
+                        android:textColor="@color/on_surface"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/mascotCaption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/coo_idle"
+                        android:textColor="@color/on_surface_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+                <com.outshake.ui.mascot.PigeonView
+                    android:id="@+id/pigeonScene"
+                    android:layout_width="match_parent"
+                    android:layout_height="248dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="@string/cd_feed_coo" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sceneAction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="54dp"
+                    android:layout_marginHorizontal="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/feed_connect"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="26dp"
+                    app:backgroundTint="@color/seed_button"
+                    android:textColor="@color/on_seed_button" />
+                <TextView
+                    android:id="@+id/connectHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:paddingBottom="18dp"
+                    android:text="@string/shake_hint"
+                    android:textSize="12sp"
+                    android:textColor="@color/on_surface_secondary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/errorText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:layout_marginTop="12dp"
+            android:textSize="14sp"
             android:textColor="@color/error"
-            android:paddingTop="8dp"
+            android:accessibilityLiveRegion="polite"
             android:visibility="gone" />
-    </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/profiles_header"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:textColor="@color/on_surface"
-        android:textStyle="bold"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp" />
-
-    <!-- Empty state: friendly centered message shown when there are no profiles. -->
-    <LinearLayout
-        android:id="@+id/emptyState"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:src="@drawable/ic_empty_servers"
-            app:tint="@color/on_surface_secondary"
-            android:alpha="0.6"
-            android:importantForAccessibility="no"
-            android:layout_marginBottom="16dp" />
-
-        <TextView
-            android:id="@+id/emptyText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/empty_state_title"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="@color/on_surface"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="22dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="@string/roost_header"
+                android:textColor="@color/on_surface"
+                android:textStyle="bold"
+                android:textSize="20sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addButton"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/add_server"
+                app:cornerRadius="24dp" />
+        </LinearLayout>
 
         <TextView
+            android:id="@+id/activeText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/empty_state_message"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:layout_marginBottom="12dp"
+            android:text="@string/no_active_profile"
             android:textColor="@color/on_surface_secondary"
-            android:paddingTop="6dp" />
-    </LinearLayout>
+            android:textSize="12sp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/profileList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="8dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addButton"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <TextView
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="52dp"
-            android:layout_marginEnd="10dp"
-            android:text="@string/add_profile"
-            app:cornerRadius="26dp" />
+            android:background="@drawable/bg_status"
+            android:padding="20dp"
+            android:text="@string/roost_empty"
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="@color/on_surface_secondary"
+            android:visibility="gone" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/settingsButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/profileList"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="52dp"
-            android:text="@string/settings"
-            app:cornerRadius="26dp" />
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/footer_note"
+            android:textSize="12sp"
+            android:textColor="@color/on_surface_secondary" />
     </LinearLayout>
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>

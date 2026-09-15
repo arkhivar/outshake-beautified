@@ -23,6 +23,10 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # The legacy "tools" package is no longer published. Install only
+          # the packages declared by this project's Android build.
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v3
